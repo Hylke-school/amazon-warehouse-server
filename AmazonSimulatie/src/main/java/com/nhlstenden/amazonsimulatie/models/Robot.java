@@ -42,7 +42,7 @@ class Robot implements Object3D, Updatable {
         } else {
             this.z += 0.5;
         }
-        
+        this.y = 0.15;
         return true;
     }
 
