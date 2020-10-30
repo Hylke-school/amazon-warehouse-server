@@ -33,6 +33,7 @@ class Truck implements Object3D, Updatable {
         this.rotationY = rotationY;
         this.rotationZ = rotationZ;
         this.uuid = UUID.randomUUID();
+
     }
 
     @Override

@@ -37,9 +37,6 @@ class Rack implements Object3D, Updatable {
 
     @Override
     public boolean update() {
-        this.x = 12;
-        this.z = 12;
-        this.y = 1.5;
         return true;
     }
 
@@ -64,9 +61,17 @@ class Rack implements Object3D, Updatable {
         return this.x;
     }
 
+    public void setX(double x){
+        this.x = x;
+    }
+
     @Override
     public double getY() {
         return this.y;
+    }
+
+    public void setY(double y){
+        this.y = y;
     }
 
     @Override
@@ -74,9 +79,17 @@ class Rack implements Object3D, Updatable {
         return this.z;
     }
 
+    public void setZ(double z){
+        this.z = z;
+    }
+
     @Override
     public double getRotationX() {
         return this.rotationX;
+    }
+
+    public void setRotationX(double rotationX){
+        this.rotationX = rotationX;
     }
 
     @Override
@@ -84,8 +97,16 @@ class Rack implements Object3D, Updatable {
         return this.rotationY;
     }
 
+    public void setRotationY(double rotationY){
+        this.rotationY = rotationY;
+    }
+
     @Override
     public double getRotationZ() {
         return this.rotationZ;
+    }
+
+    public void setRotationZ(double rotationZ){
+        this.rotationZ = rotationZ;
     }
 }

@@ -32,9 +32,10 @@ window.onload = function () {
         window.addEventListener('resize', onWindowResize, false);
 
         const geometry = new THREE.PlaneGeometry(30, 30);
-        const material = new THREE.MeshPhongMaterial({ color: 0xffffdd, side: THREE.DoubleSide });
-        const plane = new THREE.Mesh(geometry, material);
+        const groundmaterial = new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load("textures/ground.png"), side: THREE.DoubleSide });
+        const plane = new THREE.Mesh(geometry, groundmaterial);
 
+        const material = new THREE.MeshPhongMaterial({ color: 0xffffdd, side: THREE.DoubleSide });
         const geometry2 = new THREE.PlaneGeometry(30,5);
         const plane2 = new THREE.Mesh(geometry2,material);
 
