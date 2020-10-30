@@ -2,12 +2,7 @@ package com.nhlstenden.amazonsimulatie.models;
 
 import java.util.UUID;
 
-/*
- * Deze class stelt een robot voor. Hij impelementeerd de class Object3D, omdat het ook een
- * 3D object is. Ook implementeerd deze class de interface Updatable. Dit is omdat
- * een robot geupdate kan worden binnen de 3D wereld om zich zo voort te bewegen.
- */
-class Robot implements Object3D, Updatable {
+class Truck implements Object3D, Updatable {
     private UUID uuid;
 
     private double x = 0;
@@ -18,19 +13,19 @@ class Robot implements Object3D, Updatable {
     private double rotationY = 0;
     private double rotationZ = 0;
 
-    public Robot() {
+    public Truck() {
         this(0, 1, 0, 0, 0, 0);
     }
-    public Robot(double x, double z){
+    public Truck(double x, double z){
         this(x,1,z,0,0,0);
     }
-    public Robot(double x, double y, double z){
+    public Truck(double x, double y, double z){
         this(x,y,z,0,0,0);
     }
-    public Robot(double x, double z, double rotationX, double rotationZ){
+    public Truck(double x, double z, double rotationX, double rotationZ){
         this(x,1,z,rotationX,0,rotationZ);
     }
-    public Robot(double x, double y, double z, double rotationX, double rotationY, double rotationZ){
+    public Truck(double x, double y, double z, double rotationX, double rotationY, double rotationZ){
         this.x = x;
         this.y = y;
         this.z = z;
@@ -40,30 +35,16 @@ class Robot implements Object3D, Updatable {
         this.uuid = UUID.randomUUID();
     }
 
-    /*
-     * Deze update methode wordt door de World aangeroepen wanneer de
-     * World zelf geupdate wordt. Dit betekent dat elk object, ook deze
-     * robot, in de 3D wereld steeds een beetje tijd krijgt om een update
-     * uit te voeren. In de updatemethode hieronder schrijf je dus de code
-     * die de robot steeds uitvoert (bijvoorbeeld positieveranderingen). Wanneer
-     * de methode true teruggeeft (zoals in het voorbeeld), betekent dit dat
-     * er inderdaad iets veranderd is en dat deze nieuwe informatie naar de views
-     * moet worden gestuurd. Wordt false teruggegeven, dan betekent dit dat er niks
-     * is veranderd, en de informatie hoeft dus niet naar de views te worden gestuurd.
-     * (Omdat de informatie niet veranderd is, is deze dus ook nog steeds hetzelfde als
-     * in de view)
-     */
     @Override
     public boolean update() {
-        if(x < 15) {
-            this.x += 0.5;
-        } else if(z < 15){
-            this.z += 0.5;
-        } else if (x > 0 && z > 0) {
-            this.x -= 15;
-            this.z -= 15;
+        this.x = 32.5;
+        if(this.z>10){
+            this.z -= 1;
         }
-        this.y = 0.15;
+        else{
+            this.z = 50;
+        }
+        this.y = 1;
         return true;
     }
 
@@ -80,7 +61,7 @@ class Robot implements Object3D, Updatable {
          * is op de client, en die verstuurd moet kunnen worden naar de browser. In de
          * javascript code wordt dit dan weer verder afgehandeld.
          */
-        return Robot.class.getSimpleName().toLowerCase();
+        return Truck.class.getSimpleName().toLowerCase();
     }
 
     @Override

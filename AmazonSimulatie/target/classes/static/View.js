@@ -63,21 +63,21 @@ window.onload = function () {
         dock.position.y = 2.5;
         dock.position.z = 15;
 
-        const bggroup = new THREE.Group();
-        bggroup.add(plane,plane2,plane3,plain,dock);
-        scene.add(bggroup);
+        const worldgroup = new THREE.Group();
+        worldgroup.add(plane,plane2,plane3,plain,dock);
+        scene.add(worldgroup);
 
-        const pointlightcolour = 0x404040;
+        const lightcolour = 0x404040;
         const pointlightintensity = 3;
-        const pointlight = new THREE.PointLight(pointlightcolour, pointlightintensity,0,2);
+        const pointlight = new THREE.PointLight(lightcolour, pointlightintensity,0,2);
         pointlight.position.set(15, 20, 15);
 
-        const amblightcolour = 0x404040;
         const amblightintensity = 0.5;
-        const amblight = new THREE.AmbientLight(amblightcolour,amblightintensity);
+        const amblight = new THREE.AmbientLight(lightcolour,amblightintensity);
 
-        scene.add(pointlight);
-        scene.add(amblight);
+        const lightgroup = new THREE.Group();
+        lightgroup.add(pointlight,amblight);
+        scene.add(lightgroup);
     }
 
     function onWindowResize() {
@@ -113,7 +113,7 @@ window.onload = function () {
             if (Object.keys(worldObjects).indexOf(command.parameters.uuid) < 0) {
                 //Wanneer het object een robot is, wordt de code hieronder uitgevoerd.
                 if (command.parameters.type == "robot") {
-                    const geometry = new THREE.BoxGeometry(0.9, 0.3, 0.9);
+                    const robotgeometry = new THREE.BoxGeometry(0.9, 0.3, 0.9);
                     const cubeMaterials = [
                         new THREE.MeshBasicMaterial({
                             map: new THREE.TextureLoader().load("textures/robot_side.png"),
@@ -141,11 +141,78 @@ window.onload = function () {
                         }), //BACK
                     ];
                     const material = new THREE.MeshFaceMaterial(cubeMaterials);
-                    let robot = new THREE.Mesh(geometry, material);
-                    robot.position.y = 1;
+                    let robot = new THREE.Mesh(robotgeometry, material);
 
                     scene.add(robot);
                     worldObjects[command.parameters.uuid] = robot;
+                }
+                else if (command.parameters.type == "rack"){
+                    const rackgeometry = new THREE.BoxGeometry(1,3,1);
+                    const rackmaterials = [
+                        new THREE.MeshBasicMaterial({
+                            map: new THREE.TextureLoader().load("textures/rack_side.png"),
+                            side: THREE.DoubleSide
+                        }),
+                        new THREE.MeshBasicMaterial({
+                            map: new THREE.TextureLoader().load("textures/rack_side.png"),
+                            side: THREE.DoubleSide
+                        }),
+                        new THREE.MeshBasicMaterial({
+                            map: new THREE.TextureLoader().load("textures/rack_top_bottom.png"),
+                            side: THREE.DoubleSide
+                        }),
+                        new THREE.MeshBasicMaterial({
+                            map: new THREE.TextureLoader().load("textures/rack_top_bottom.png"),
+                            side: THREE.DoubleSide
+                        }),
+                        new THREE.MeshBasicMaterial({
+                            map: new THREE.TextureLoader().load("textures/rack_side.png"),
+                            side: THREE.DoubleSide
+                        }),
+                        new THREE.MeshBasicMaterial({
+                            map: new THREE.TextureLoader().load("textures/rack_side.png"),
+                            side: THREE.DoubleSide
+                        })
+                    ];
+                    const material = new THREE.MeshFaceMaterial(rackmaterials);
+                    let rack = new THREE.Mesh(rackgeometry,material);
+
+                    scene.add(rack);
+                    worldObjects[command.parameters.uuid] = rack;
+                }
+                else if (command.parameters.type == "truck"){
+                    const truckgeometry = new THREE.BoxGeometry(2.2,2,8)
+                    const truckmaterials = [
+                        new THREE.MeshBasicMaterial({
+                            map: new THREE.TextureLoader().load("textures/truck_right.png"),
+                            side: THREE.DoubleSide
+                        }),
+                        new THREE.MeshBasicMaterial({
+                            map: new THREE.TextureLoader().load("textures/truck_left.png"),
+                            side: THREE.DoubleSide
+                        }),
+                        new THREE.MeshBasicMaterial({
+                            map: new THREE.TextureLoader().load("textures/truck_top.png"),
+                            side: THREE.DoubleSide
+                        }),
+                        new THREE.MeshBasicMaterial({
+                            map: new THREE.TextureLoader().load("textures/truck_bottom.png"),
+                            side: THREE.DoubleSide
+                        }),
+                        new THREE.MeshBasicMaterial({
+                            map: new THREE.TextureLoader().load("textures/truck_rear.png"),
+                            side: THREE.DoubleSide
+                        }),
+                        new THREE.MeshBasicMaterial({
+                            map: new THREE.TextureLoader().load("textures/truck_front.png"),
+                            side: THREE.DoubleSide
+                        })
+                    ];
+                    const truckmaterial = new THREE.MeshFaceMaterial(truckmaterials);
+                    let truck = new THREE.Mesh(truckgeometry,truckmaterial);
+
+                    scene.add(truck);
+                    worldObjects[command.parameters.uuid] = truck;
                 }
             }
 
