@@ -10,6 +10,10 @@ window.onload = function () {
         camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
         cameraControls = new THREE.OrbitControls(camera);
         cameraControls.target.set(15,5,15);
+        cameraControls.maxPolarAngle = Math.PI / 2;
+        cameraControls.minAzimuthAngle = -Math.PI / 5;
+        cameraControls.maxAzimuthAngle = Math.PI / 5;
+        cameraControls.enablePan = false;
 
         camera.position.z = 15;
         camera.position.y = 35;
@@ -68,15 +72,23 @@ window.onload = function () {
         scene.add(worldgroup);
 
         const lightcolour = 0x404040;
-        const pointlightintensity = 3;
+        const pointlightintensity = 0.8;
         const pointlight = new THREE.PointLight(lightcolour, pointlightintensity,0,2);
-        pointlight.position.set(15, 20, 15);
+        const pointlight2 = new THREE.PointLight(lightcolour, pointlightintensity,0,2);
+        const pointlight3 = new THREE.PointLight(lightcolour, pointlightintensity,0,2);
+        const pointlight4 = new THREE.PointLight(lightcolour, pointlightintensity,0,2);
+        const pointlight5 = new THREE.PointLight(lightcolour, 2, 100, 2);
+        pointlight.position.set(7.5, 10, 5);
+        pointlight2.position.set(22.5,10,5);
+        pointlight3.position.set(22.5,10,20);
+        pointlight4.position.set(7.5,10,20);
+        pointlight5.position.set(15,40,15);
 
-        const amblightintensity = 0.5;
+        const amblightintensity = 0.4;
         const amblight = new THREE.AmbientLight(lightcolour,amblightintensity);
 
         const lightgroup = new THREE.Group();
-        lightgroup.add(pointlight,amblight);
+        lightgroup.add(pointlight,pointlight2,pointlight3,pointlight4,pointlight5,amblight);
         scene.add(lightgroup);
     }
 
