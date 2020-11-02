@@ -36,10 +36,12 @@ public class World implements Model {
         Robot robot = new Robot(1,1);
         Robot robot2 = new Robot(29,29);
         Rack rack = new Rack();
+        Rack rack2 = new Rack(25,25);
         robot.setChild(rack);
         this.worldObjects.add(robot);
         this.worldObjects.add(robot2);
         this.worldObjects.add(rack);
+        this.worldObjects.add(rack2);
         this.worldObjects.add(new Truck());
     }
 

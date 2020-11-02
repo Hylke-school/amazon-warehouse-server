@@ -14,16 +14,16 @@ class Truck implements Object3D, Updatable {
     private double rotationZ = 0;
 
     public Truck() {
-        this(0, 1, 0, 0, 0, 0);
+        this(0, 0, 0, 0, 0, 0);
     }
     public Truck(double x, double z){
-        this(x,1,z,0,0,0);
+        this(x,0,z,0,0,0);
     }
     public Truck(double x, double y, double z){
         this(x,y,z,0,0,0);
     }
     public Truck(double x, double z, double rotationX, double rotationZ){
-        this(x,1,z,rotationX,0,rotationZ);
+        this(x,0,z,rotationX,0,rotationZ);
     }
     public Truck(double x, double y, double z, double rotationX, double rotationY, double rotationZ){
         this.x = x;
@@ -45,7 +45,6 @@ class Truck implements Object3D, Updatable {
         else{
             this.z = 50;
         }
-        this.y = 1;
         return true;
     }
 

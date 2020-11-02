@@ -18,7 +18,7 @@ class Robot implements Object3D, Updatable {
     private double rotationY = 0;
     private double rotationZ = 0;
 
-    private Rack child;
+    public Rack child;
 
     public Robot() {
         this(0, 1, 0, 0, 0, 0);
@@ -58,9 +58,18 @@ class Robot implements Object3D, Updatable {
     @Override
     public boolean update() {
         this.y = 0.15;
+        if(x<28){
+            this.x += 0.5;
+        } else if (z<28){
+            this.z += 0.5;
+        } else{
+            this.x = 0;
+            this.z = 0;
+            this.removeChild();
+        }
         if(child != null){
             child.setX(this.x);
-            child.setY(this.y+1.65);
+            child.setY(this.y+0.15);
             child.setZ(this.z);
             child.setRotationX(this.rotationX);
             child.setRotationY(this.rotationY);
@@ -75,7 +84,7 @@ class Robot implements Object3D, Updatable {
 
     public void removeChild(){
         if(child != null){
-            child.setY(1.5);
+            child.setY(0);
         }
         child = null;
     }

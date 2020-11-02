@@ -1,5 +1,26 @@
 let socket;
 
+function loadGLTF(path, scaling) {
+    let loader = new THREE.GLTFLoader();
+    let group = new THREE.Group();
+
+    loader.load(path, function(gltf) {
+        gltf.scene.traverse(function( node ) {
+
+            if ( node.isMesh )
+            {   node.castShadow = true;
+                node.receiveShadow = true
+            }
+
+        });
+        let object3d = gltf.scene;
+        object3d.scale.set(scaling,scaling,scaling);
+
+        group.add(object3d);
+    });
+    return group;
+}
+
 window.onload = function () {
     let camera, scene, renderer, canvas;
     let cameraControls;
@@ -31,6 +52,7 @@ window.onload = function () {
 
         window.addEventListener('resize', onWindowResize, false);
 
+        //region Background
         const geometry = new THREE.PlaneGeometry(30, 30);
         const groundmaterial = new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load("textures/ground.png"), side: THREE.DoubleSide });
         const plane = new THREE.Mesh(geometry, groundmaterial);
@@ -61,7 +83,7 @@ window.onload = function () {
         plane3.position.y = 2.5;
 
         plain.position.x = 15;
-        plain.position.y = -2.51
+        plain.position.y = -2.51;
         plain.position.z = 15;
 
         dock.position.x = 32.5;
@@ -71,6 +93,7 @@ window.onload = function () {
         const worldgroup = new THREE.Group();
         worldgroup.add(plane,plane2,plane3,plain,dock);
         scene.add(worldgroup);
+        //endregion
 
         const lightcolour = 0x404040;
         const pointlightintensity = 0.8;
@@ -160,69 +183,70 @@ window.onload = function () {
                     worldObjects[command.parameters.uuid] = robot;
                 }
                 else if (command.parameters.type == "rack"){
-                    const rackgeometry = new THREE.BoxGeometry(1,3,1);
-                    const rackmaterials = [
-                        new THREE.MeshBasicMaterial({
-                            map: new THREE.TextureLoader().load("textures/rack_side.png"),
-                            side: THREE.DoubleSide
-                        }),
-                        new THREE.MeshBasicMaterial({
-                            map: new THREE.TextureLoader().load("textures/rack_side.png"),
-                            side: THREE.DoubleSide
-                        }),
-                        new THREE.MeshBasicMaterial({
-                            map: new THREE.TextureLoader().load("textures/rack_top_bottom.png"),
-                            side: THREE.DoubleSide
-                        }),
-                        new THREE.MeshBasicMaterial({
-                            map: new THREE.TextureLoader().load("textures/rack_top_bottom.png"),
-                            side: THREE.DoubleSide
-                        }),
-                        new THREE.MeshBasicMaterial({
-                            map: new THREE.TextureLoader().load("textures/rack_side.png"),
-                            side: THREE.DoubleSide
-                        }),
-                        new THREE.MeshBasicMaterial({
-                            map: new THREE.TextureLoader().load("textures/rack_side.png"),
-                            side: THREE.DoubleSide
-                        })
-                    ];
-                    const material = new THREE.MeshFaceMaterial(rackmaterials);
-                    let rack = new THREE.Mesh(rackgeometry,material);
-
+                    let rack = loadGLTF('/models/storage_rack/scene.gltf',1);
+                    // const rackgeometry = new THREE.BoxGeometry(1,3,1);
+                    // const rackmaterials = [
+                    //     new THREE.MeshBasicMaterial({
+                    //         map: new THREE.TextureLoader().load("textures/rack_side.png"),
+                    //         side: THREE.DoubleSide
+                    //     }),
+                    //     new THREE.MeshBasicMaterial({
+                    //         map: new THREE.TextureLoader().load("textures/rack_side.png"),
+                    //         side: THREE.DoubleSide
+                    //     }),
+                    //     new THREE.MeshBasicMaterial({
+                    //         map: new THREE.TextureLoader().load("textures/rack_top_bottom.png"),
+                    //         side: THREE.DoubleSide
+                    //     }),
+                    //     new THREE.MeshBasicMaterial({
+                    //         map: new THREE.TextureLoader().load("textures/rack_top_bottom.png"),
+                    //         side: THREE.DoubleSide
+                    //     }),
+                    //     new THREE.MeshBasicMaterial({
+                    //         map: new THREE.TextureLoader().load("textures/rack_side.png"),
+                    //         side: THREE.DoubleSide
+                    //     }),
+                    //     new THREE.MeshBasicMaterial({
+                    //         map: new THREE.TextureLoader().load("textures/rack_side.png"),
+                    //         side: THREE.DoubleSide
+                    //     })
+                    // ];
+                    // const material = new THREE.MeshFaceMaterial(rackmaterials);
+                    // let rack = new THREE.Mesh(rackgeometry,material);
                     scene.add(rack);
                     worldObjects[command.parameters.uuid] = rack;
                 }
                 else if (command.parameters.type == "truck"){
-                    const truckgeometry = new THREE.BoxGeometry(2.2,2,8)
-                    const truckmaterials = [
-                        new THREE.MeshBasicMaterial({
-                            map: new THREE.TextureLoader().load("textures/truck_right.png"),
-                            side: THREE.DoubleSide
-                        }),
-                        new THREE.MeshBasicMaterial({
-                            map: new THREE.TextureLoader().load("textures/truck_left.png"),
-                            side: THREE.DoubleSide
-                        }),
-                        new THREE.MeshBasicMaterial({
-                            map: new THREE.TextureLoader().load("textures/truck_top.png"),
-                            side: THREE.DoubleSide
-                        }),
-                        new THREE.MeshBasicMaterial({
-                            map: new THREE.TextureLoader().load("textures/truck_bottom.png"),
-                            side: THREE.DoubleSide
-                        }),
-                        new THREE.MeshBasicMaterial({
-                            map: new THREE.TextureLoader().load("textures/truck_rear.png"),
-                            side: THREE.DoubleSide
-                        }),
-                        new THREE.MeshBasicMaterial({
-                            map: new THREE.TextureLoader().load("textures/truck_front.png"),
-                            side: THREE.DoubleSide
-                        })
-                    ];
-                    const truckmaterial = new THREE.MeshFaceMaterial(truckmaterials);
-                    let truck = new THREE.Mesh(truckgeometry,truckmaterial);
+                    let truck = loadGLTF('/models/truck/scene.gltf',1);
+                    // const truckgeometry = new THREE.BoxGeometry(2.2,2,8)
+                    // const truckmaterials = [
+                    //     new THREE.MeshBasicMaterial({
+                    //         map: new THREE.TextureLoader().load("textures/truck_right.png"),
+                    //         side: THREE.DoubleSide
+                    //     }),
+                    //     new THREE.MeshBasicMaterial({
+                    //         map: new THREE.TextureLoader().load("textures/truck_left.png"),
+                    //         side: THREE.DoubleSide
+                    //     }),
+                    //     new THREE.MeshBasicMaterial({
+                    //         map: new THREE.TextureLoader().load("textures/truck_top.png"),
+                    //         side: THREE.DoubleSide
+                    //     }),
+                    //     new THREE.MeshBasicMaterial({
+                    //         map: new THREE.TextureLoader().load("textures/truck_bottom.png"),
+                    //         side: THREE.DoubleSide
+                    //     }),
+                    //     new THREE.MeshBasicMaterial({
+                    //         map: new THREE.TextureLoader().load("textures/truck_rear.png"),
+                    //         side: THREE.DoubleSide
+                    //     }),
+                    //     new THREE.MeshBasicMaterial({
+                    //         map: new THREE.TextureLoader().load("textures/truck_front.png"),
+                    //         side: THREE.DoubleSide
+                    //     })
+                    // ];
+                    // const truckmaterial = new THREE.MeshFaceMaterial(truckmaterials);
+                    // let truck = new THREE.Mesh(truckgeometry,truckmaterial);
 
                     scene.add(truck);
                     worldObjects[command.parameters.uuid] = truck;
