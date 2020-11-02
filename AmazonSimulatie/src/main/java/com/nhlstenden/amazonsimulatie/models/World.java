@@ -32,10 +32,10 @@ public class World implements Model {
      * De wereld maakt een lege lijst voor worldObjects aan. Daarin wordt nu één robot gestopt.
      * Deze methode moet uitgebreid worden zodat alle objecten van de 3D wereld hier worden gemaakt.
      */
-    public World() {
+    public World(int percentage) {
         this.worldObjects = new ArrayList<>();
         addObject(new Truck());
-        populateRacks(100);
+        populateRacks(percentage);
         addObject(new Robot(1,1));
         addObject(new Robot(15,15));
         addObject(new Robot(29,29));
