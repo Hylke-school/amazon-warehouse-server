@@ -10,27 +10,27 @@ import java.util.UUID;
 class Robot implements Object3D, Updatable {
     private UUID uuid;
 
-    private double x = 0;
-    private double y = 0;
-    private double z = 0;
+    private double x;
+    private double y;
+    private double z;
 
-    private double rotationX = 0;
-    private double rotationY = 0;
-    private double rotationZ = 0;
+    private double rotationX;
+    private double rotationY;
+    private double rotationZ;
 
     public Rack child;
 
     public Robot() {
-        this(0, 1, 0, 0, 0, 0);
+        this(0, 0.15, 0, 0, 0, 0);
     }
     public Robot(double x, double z){
-        this(x,1,z,0,0,0);
+        this(x,0.15,z,0,0,0);
     }
     public Robot(double x, double y, double z){
         this(x,y,z,0,0,0);
     }
     public Robot(double x, double z, double rotationX, double rotationZ){
-        this(x,1,z,rotationX,0,rotationZ);
+        this(x,0.15,z,rotationX,0,rotationZ);
     }
     public Robot(double x, double y, double z, double rotationX, double rotationY, double rotationZ){
         this.x = x;
@@ -57,16 +57,6 @@ class Robot implements Object3D, Updatable {
      */
     @Override
     public boolean update() {
-        this.y = 0.15;
-        if(x<28){
-            this.x += 0.5;
-        } else if (z<28){
-            this.z += 0.5;
-        } else{
-            this.x = 0;
-            this.z = 0;
-            this.removeChild();
-        }
         if(child != null){
             child.setX(this.x);
             child.setY(this.y+0.15);

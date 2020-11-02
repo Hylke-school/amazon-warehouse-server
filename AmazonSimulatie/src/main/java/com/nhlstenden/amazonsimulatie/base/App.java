@@ -52,7 +52,8 @@ public class App extends SpringBootServletInitializer implements WebSocketConfig
     * SpringApplication.run().
     */
     public App() {
-        this.controller = new SimulationController(new World());
+        World world = new World();
+        this.controller = new SimulationController(world);
         this.controller.start();
     }
 

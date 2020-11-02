@@ -4,6 +4,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /*
  * Deze class is een versie van het model van de simulatie. In dit geval is het
@@ -33,16 +34,33 @@ public class World implements Model {
      */
     public World() {
         this.worldObjects = new ArrayList<>();
-        Robot robot = new Robot(1,1);
-        Robot robot2 = new Robot(29,29);
-        Rack rack = new Rack();
-        Rack rack2 = new Rack(25,25);
-        robot.setChild(rack);
-        this.worldObjects.add(robot);
-        this.worldObjects.add(robot2);
-        this.worldObjects.add(rack);
-        this.worldObjects.add(rack2);
-        this.worldObjects.add(new Truck());
+        addObject(new Truck());
+        populateRacks(100);
+        addObject(new Robot(1,1));
+        addObject(new Robot(15,15));
+        addObject(new Robot(29,29));
+//        addObject(new Rack(1,1));
+//        addObject(new Rack(15,16));
+//        addObject(new Rack(15,15));
+//        addObject(new Rack(29,29));
+    }
+
+    public void addObject(Object3D object){
+        this.worldObjects.add(object);
+    }
+
+    public void populateRacks(int percentage){
+        Random random = new Random();
+        boolean checkgrid,checkrandom;
+        for (int i = 2; i < 25; i++){
+            for (int j = 2; j < 29; j++){
+                checkrandom = random.nextInt(100)+1 <= percentage;
+                checkgrid = !(i==4||i==7||i==10||i==13||i==16||i==19||i==22||j==14);
+                if(checkrandom&&checkgrid){
+                    addObject(new Rack(i,j));
+                }
+            }
+        }
     }
 
     /*
