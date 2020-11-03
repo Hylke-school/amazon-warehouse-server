@@ -68,15 +68,52 @@ class Robot implements Object3D, Updatable {
         return true;
     }
 
+    /**
+     * sets a rack to be child of a robot
+     * @param child rack to become a child
+     */
     public void setChild(Rack child){
         this.child = child;
     }
 
+    /**
+     * removes rack from robot
+     */
     public void removeChild(){
         if(child != null){
             child.setY(0);
         }
         child = null;
+    }
+
+    /**
+     * to be implemented, returns boolean true if the robot is not available for picking up a new rack
+     * @return boolean: true if robot is busy
+     */
+    public boolean isBusy(){
+        return true;
+    }
+
+    /**
+     * to be implemented, maneuvers robot to rack, and picks it up, then delivers to the truck
+     * @param rack the rack to be picked up
+     */
+    public void pickup(Rack rack){
+        double x = rack.getX();
+        double z = rack.getZ();
+        moveTo(x,z);
+        setChild(rack);
+        //moveTo(dropoff location);
+        removeChild();
+    }
+
+    /**
+     * moves robot to a place, uses pathfinding
+     * @param x x coordinate to move to
+     * @param z z coordinate to move to
+     */
+    private void moveTo(double x, double z) {
+
     }
 
     @Override

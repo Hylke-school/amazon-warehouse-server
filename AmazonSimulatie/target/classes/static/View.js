@@ -42,6 +42,8 @@ window.onload = function () {
 
         cameraControls.update();
 
+
+
         scene = new THREE.Scene();
 
         canvas = document.querySelector('#view');
@@ -54,14 +56,16 @@ window.onload = function () {
 
         //region Background
         const geometry = new THREE.PlaneGeometry(30, 30);
-        const groundmaterial = new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load("textures/ground.png"), side: THREE.DoubleSide });
-        const plane = new THREE.Mesh(geometry, groundmaterial);
+        const groundmaterial = new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load("textures/concrete_floor.jpg"), side: THREE.DoubleSide });
+        const ground = new THREE.Mesh(geometry, groundmaterial);
+
+        let floorgrid = loadGLTF('/models/floor/scene.gltf',1);
 
         const material = new THREE.MeshPhongMaterial({ color: 0xffffdd, side: THREE.DoubleSide });
         const geometry2 = new THREE.PlaneGeometry(30,5);
-        const plane2 = new THREE.Mesh(geometry2,material);
+        const wall = new THREE.Mesh(geometry2,material);
 
-        const plane3 = new THREE.Mesh(geometry2,material);
+        const wall2 = new THREE.Mesh(geometry2,material);
 
         const plaingeometry = new THREE.BoxGeometry(100,5,100);
         const plainmaterial = new THREE.MeshPhongMaterial({ color: 0xaaffaa, side: THREE.DoubleSide });
@@ -71,16 +75,21 @@ window.onload = function () {
         const dockmaterial = new THREE.MeshPhongMaterial({ color: 0xffdddd, side: THREE.DoubleSide });
         const dock = new THREE.Mesh(dockgeometry,dockmaterial);
 
-        plane.rotation.x = Math.PI / 2.0;
-        plane.position.x = 15;
-        plane.position.z = 15;
+        ground.rotation.x = Math.PI / 2.0;
+        ground.position.x = 15;
+        ground.position.z = 15;
 
-        plane2.position.x = 15;
-        plane2.position.y = 2.5;
+        floorgrid.rotation.y = -Math.PI / 2.0;
+        floorgrid.position.x = 15;
+        floorgrid.position.y = -0.1;
+        floorgrid.position.z = 15;
 
-        plane3.rotation.y = Math.PI / 2.0;
-        plane3.position.z = 15;
-        plane3.position.y = 2.5;
+        wall.position.x = 15;
+        wall.position.y = 2.5;
+
+        wall2.rotation.y = Math.PI / 2.0;
+        wall2.position.z = 15;
+        wall2.position.y = 2.5;
 
         plain.position.x = 15;
         plain.position.y = -2.51;
@@ -91,7 +100,7 @@ window.onload = function () {
         dock.position.z = 15;
 
         const worldgroup = new THREE.Group();
-        worldgroup.add(plane,plane2,plane3,plain,dock);
+        worldgroup.add(ground,wall,wall2,plain,dock,floorgrid);
         scene.add(worldgroup);
         //endregion
 

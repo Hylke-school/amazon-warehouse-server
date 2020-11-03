@@ -21,6 +21,8 @@ public class World implements Model {
      * een lijst van Object3D onderdelen. Deze kunnen in principe alles zijn. (Robots, vrachrtwagens, etc)
      */
     private List<Object3D> worldObjects;
+    private List<Robot> robotList;
+    private List<Rack> rackList;
 
     /*
      * Dit onderdeel is nodig om veranderingen in het model te kunnen doorgeven aan de controller.
@@ -32,34 +34,88 @@ public class World implements Model {
      * De wereld maakt een lege lijst voor worldObjects aan. Daarin wordt nu één robot gestopt.
      * Deze methode moet uitgebreid worden zodat alle objecten van de 3D wereld hier worden gemaakt.
      */
-    public World(int percentage) {
+    public World(int percentageFilled, int amountRobots) {
         this.worldObjects = new ArrayList<>();
-        addObject(new Truck());
-        populateRacks(percentage);
-        addObject(new Robot(1,1));
-        addObject(new Robot(15,15));
-        addObject(new Robot(29,29));
-//        addObject(new Rack(1,1));
-//        addObject(new Rack(15,16));
-//        addObject(new Rack(15,15));
-//        addObject(new Rack(29,29));
+        this.robotList = new ArrayList<>();
+        this.rackList = new ArrayList<>();
+
+        addRobots(amountRobots);
+
+        populateRacks(percentageFilled);
     }
 
+    /**
+     * takes an Object3D object, checks if it's an instance of robot or rack, and adds to respective list
+     * then adds the object to the worldobjects list to be rendered
+     * @param object object to be added
+     */
     public void addObject(Object3D object){
+        if(object instanceof Robot){
+            robotList.add((Robot)object);
+        }else if(object instanceof Rack){
+            rackList.add((Rack)object);
+        }
         this.worldObjects.add(object);
     }
+    public void addRobots(int amountRobots){
+        for(int i = 1; i <= amountRobots; i++){
+            if(i <= 29){
+                addObject(new Robot(29,i));
+            } else{
+                addObject(new Robot(28, i-29));
+            }
+        }
+    }
 
+    /**
+     * populates the grid randomly with storage racks, only in permitted areas
+     * @param percentage percentage of slots to be filled with storage racks
+     */
     public void populateRacks(int percentage){
         Random random = new Random();
         boolean checkgrid,checkrandom;
         for (int i = 2; i < 25; i++){
             for (int j = 2; j < 29; j++){
                 checkrandom = random.nextInt(100)+1 <= percentage;
-                checkgrid = !(i==4||i==7||i==10||i==13||i==16||i==19||i==22||j==14);
+                checkgrid = !(i==4||i==7||i==10||i==13||i==16||i==19||i==22||j==15);
                 if(checkrandom&&checkgrid){
                     addObject(new Rack(i,j));
                 }
             }
+        }
+    }
+
+    /**
+     * goes through list of racks and robots, and assigns racks to robots.
+     * sleeps 100 ms to prevent resource usage
+     */
+    public void pickupRacks(){
+        while(rackList.size() != 0){
+            for(int i = 0; i < rackList.size(); i++){
+                for(Robot robot : robotList){
+                    if(!robot.isBusy()&&!rackList.get(i).isBusy()){
+                        robot.pickup(rackList.get(i));
+                        removeRack(rackList.get(i));
+                    }
+                }
+            }
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * removes rack from rackList, checks if the rack isn't null
+     * @param rack rack to be removed
+     */
+    public void removeRack(Rack rack){
+        try{
+            rackList.remove(rack);
+        } catch (NullPointerException e){
+            e.printStackTrace();
         }
     }
 

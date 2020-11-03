@@ -1,5 +1,11 @@
 let socket;
 
+/**
+ * function that loads a GLTF model
+ * @param path path to the model to be loaded
+ * @param scaling scaling of the model
+ * @returns {Group} Group of objects that were loaded from the model
+ */
 function loadGLTF(path, scaling) {
     let loader = new THREE.GLTFLoader();
     let group = new THREE.Group();
@@ -21,13 +27,22 @@ function loadGLTF(path, scaling) {
     return group;
 }
 
+/**
+ * method that calls when the window is loaded
+ */
 window.onload = function () {
     let camera, scene, renderer, canvas;
     let cameraControls;
 
     let worldObjects = {};
 
+    /**
+     * function that initializes the world
+     * @param array unsure
+     * @param offset unsure
+     */
     function init(array, offset) {
+        //region Camera
         camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
         cameraControls = new THREE.OrbitControls(camera);
         cameraControls.target.set(15,5,15);
@@ -41,7 +56,10 @@ window.onload = function () {
         camera.position.x = 15;
 
         cameraControls.update();
+        //endregion
 
+        //sets canvas and renderer
+        //region canvas
         scene = new THREE.Scene();
 
         canvas = document.querySelector('#view');
@@ -49,19 +67,24 @@ window.onload = function () {
         renderer.outputEncoding = THREE.sRGBEncoding;
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight + 5);
+        //endregion
 
+        //adds event listener to call the window resize function
         window.addEventListener('resize', onWindowResize, false);
 
+        //Sets all the models and meshes to form the background, adds them to scene
         //region Background
         const geometry = new THREE.PlaneGeometry(30, 30);
-        const groundmaterial = new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load("textures/ground.png"), side: THREE.DoubleSide });
-        const plane = new THREE.Mesh(geometry, groundmaterial);
+        const groundmaterial = new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load("textures/concrete_floor.jpg"), side: THREE.DoubleSide });
+        const ground = new THREE.Mesh(geometry, groundmaterial);
+
+        let floorgrid = loadGLTF('/models/floor/scene.gltf',1);
 
         const material = new THREE.MeshPhongMaterial({ color: 0xffffdd, side: THREE.DoubleSide });
         const geometry2 = new THREE.PlaneGeometry(30,5);
-        const plane2 = new THREE.Mesh(geometry2,material);
+        const wall = new THREE.Mesh(geometry2,material);
 
-        const plane3 = new THREE.Mesh(geometry2,material);
+        const wall2 = new THREE.Mesh(geometry2,material);
 
         const plaingeometry = new THREE.BoxGeometry(100,5,100);
         const plainmaterial = new THREE.MeshPhongMaterial({ color: 0xaaffaa, side: THREE.DoubleSide });
@@ -71,16 +94,21 @@ window.onload = function () {
         const dockmaterial = new THREE.MeshPhongMaterial({ color: 0xffdddd, side: THREE.DoubleSide });
         const dock = new THREE.Mesh(dockgeometry,dockmaterial);
 
-        plane.rotation.x = Math.PI / 2.0;
-        plane.position.x = 15;
-        plane.position.z = 15;
+        ground.rotation.x = Math.PI / 2.0;
+        ground.position.x = 15;
+        ground.position.z = 15;
 
-        plane2.position.x = 15;
-        plane2.position.y = 2.5;
+        floorgrid.rotation.y = -Math.PI / 2.0;
+        floorgrid.position.x = 15;
+        floorgrid.position.y = -0.1;
+        floorgrid.position.z = 15;
 
-        plane3.rotation.y = Math.PI / 2.0;
-        plane3.position.z = 15;
-        plane3.position.y = 2.5;
+        wall.position.x = 15;
+        wall.position.y = 2.5;
+
+        wall2.rotation.y = Math.PI / 2.0;
+        wall2.position.z = 15;
+        wall2.position.y = 2.5;
 
         plain.position.x = 15;
         plain.position.y = -2.51;
@@ -91,10 +119,12 @@ window.onload = function () {
         dock.position.z = 15;
 
         const worldgroup = new THREE.Group();
-        worldgroup.add(plane,plane2,plane3,plain,dock);
+        worldgroup.add(ground,wall,wall2,plain,dock,floorgrid);
         scene.add(worldgroup);
         //endregion
 
+        //Sets all the lights, their intensities, and locations, then adds them to scene
+        //region Lights
         const lightcolour = 0x404040;
         const pointlightintensity = 0.8;
         const pointlight = new THREE.PointLight(lightcolour, pointlightintensity,0,2);
@@ -114,20 +144,32 @@ window.onload = function () {
         const lightgroup = new THREE.Group();
         lightgroup.add(pointlight,pointlight2,pointlight3,pointlight4,pointlight5,amblight);
         scene.add(lightgroup);
+        //endregion
     }
 
+    /**
+     * resizes the view when window size changes
+     */
     function onWindowResize() {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
+    /**
+     * request animation frame from browser, updates camera controls, and renders the scene
+     */
     function animate() {
         requestAnimationFrame(animate);
         cameraControls.update();
         renderer.render(scene, camera);
     }
 
+    /**
+     * JSON parses a string
+     * @param input string to be parsed
+     * @returns {any} the JSON parsed string
+     */
     function parseCommand(input = "") {
         return JSON.parse(input);
     }

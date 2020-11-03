@@ -35,6 +35,14 @@ class Rack implements Object3D, Updatable {
         this.uuid = UUID.randomUUID();
     }
 
+    /**
+     * checks if the rack has been picked up by a robot, by checking its Y value
+     * @return boolean, true if the rack is on a robot
+     */
+    public boolean isBusy(){
+        return this.getY() == 0.15;
+    }
+
     @Override
     public boolean update() {
         return true;
