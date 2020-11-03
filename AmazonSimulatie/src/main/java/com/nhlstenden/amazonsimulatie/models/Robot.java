@@ -98,22 +98,27 @@ class Robot implements Object3D, Updatable {
      * to be implemented, maneuvers robot to rack, and picks it up, then delivers to the truck
      * @param rack the rack to be picked up
      */
-    public void pickup(Rack rack){
+    public boolean pickup(Rack rack, int dropoffX, int dropoffZ){
         double x = rack.getX();
         double z = rack.getZ();
-        moveTo(x,z);
-        setChild(rack);
-        //moveTo(dropoff location);
-        removeChild();
+        if(moveTo(x,z)) {
+            setChild(rack);
+            if(moveTo(dropoffX,dropoffZ)){
+                removeChild();
+                return true;
+            } else return false;
+        } else return false;
     }
+
 
     /**
      * moves robot to a place, uses pathfinding
      * @param x x coordinate to move to
      * @param z z coordinate to move to
+     * @return true once the move has finished
      */
-    private void moveTo(double x, double z) {
-
+    private boolean moveTo(double x, double z) {
+        return false;
     }
 
     @Override

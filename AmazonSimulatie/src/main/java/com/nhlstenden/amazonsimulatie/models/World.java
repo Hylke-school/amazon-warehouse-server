@@ -3,6 +3,7 @@ package com.nhlstenden.amazonsimulatie.models;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -90,12 +91,17 @@ public class World implements Model {
      * sleeps 100 ms to prevent resource usage
      */
     public void pickupRacks(){
+        int[] dropoffLocation;
         while(rackList.size() != 0){
             for(int i = 0; i < rackList.size(); i++){
                 for(Robot robot : robotList){
                     if(!robot.isBusy()&&!rackList.get(i).isBusy()){
-                        robot.pickup(rackList.get(i));
-                        removeRack(rackList.get(i));
+                        dropoffLocation = getDropoffLocation();
+                        if(dropoffLocation != null){
+                            if(robot.pickup(rackList.get(i),dropoffLocation[0],dropoffLocation[1])){
+                                removeRack(rackList.get(i));
+                            }
+                        }
                     }
                 }
             }
@@ -114,9 +120,44 @@ public class World implements Model {
     public void removeRack(Rack rack){
         try{
             rackList.remove(rack);
+            worldObjects.remove(rack);
         } catch (NullPointerException e){
             e.printStackTrace();
         }
+    }
+
+    public int[] getDropoffLocation() {
+        boolean[][] rackLocations = new boolean[28][28];
+        for (int row = 0; row < rackLocations.length; row++) {
+            for (int col = 0; col < rackLocations[row].length; col++) {
+                rackLocations[row][col] = false;
+            }
+        }
+
+        int[] dropoffLocation = new int[]{};
+        int x, z;
+
+        for(Rack rack : rackList){
+            x = (int)rack.getX();
+            z = (int)rack.getZ();
+            for (int i = 1; i <= 28; i++) {
+                for (int j = 1; j <= 28; j++) {
+                    if(x==i&&z==j){
+                        rackLocations[i][j] = true;
+                    }
+                }
+            }
+        }
+        for(int i = 26; i <= 28; i++){
+            for(int j = 2; i <= 28; j++){
+                if(!rackLocations[i][j]){
+                    dropoffLocation[0] = i;
+                    dropoffLocation[1] = j;
+                }
+            }
+        }
+
+        return dropoffLocation;
     }
 
     /*
