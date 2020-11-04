@@ -5,6 +5,8 @@ import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.nhlstenden.amazonsimulatie.controllers.LoadingBayController;
+
 /*
  * Deze class is een versie van het model van de simulatie. In dit geval is het
  * de 3D wereld die we willen modelleren (magazijn). De zogenaamde domain-logic,
@@ -26,6 +28,7 @@ public class World implements Model {
      * Het systeem werkt al as-is, dus dit hoeft niet aangepast te worden.
      */
     PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    LoadingBayController lbc = new LoadingBayController();
 
     /*
      * De wereld maakt een lege lijst voor worldObjects aan. Daarin wordt nu één robot gestopt.
@@ -34,6 +37,10 @@ public class World implements Model {
     public World() {
         this.worldObjects = new ArrayList<>();
         this.worldObjects.add(new Robot());
+
+        for (Truck truck : lbc.truckList) {
+            this.worldObjects.add(truck);
+        }
     }
 
     /*
