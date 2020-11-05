@@ -91,7 +91,7 @@ class Robot implements Object3D, Updatable {
      * @return boolean: true if robot is busy
      */
     public boolean isBusy(){
-        return true;
+        return false;
     }
 
     /**
@@ -118,7 +118,8 @@ class Robot implements Object3D, Updatable {
      * @return true once the move has finished
      */
     private boolean moveTo(double x, double z) {
-        return false;
+        System.out.printf("x: %s z: %s\n", x, z);
+        return true;
     }
 
     @Override

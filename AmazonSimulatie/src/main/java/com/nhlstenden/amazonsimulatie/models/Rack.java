@@ -2,7 +2,7 @@ package com.nhlstenden.amazonsimulatie.models;
 
 import java.util.UUID;
 
-class Rack implements Object3D, Updatable {
+public class Rack implements Object3D, Updatable {
     private UUID uuid;
 
     private double x = 0;

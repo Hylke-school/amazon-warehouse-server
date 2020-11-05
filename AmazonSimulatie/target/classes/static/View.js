@@ -1,5 +1,11 @@
 let socket;
 
+/**
+ * function that loads a GLTF model
+ * @param path path to the model to be loaded
+ * @param scaling scaling of the model
+ * @returns {Group} Group of objects that were loaded from the model
+ */
 function loadGLTF(path, scaling) {
     let loader = new THREE.GLTFLoader();
     let group = new THREE.Group();
@@ -21,13 +27,22 @@ function loadGLTF(path, scaling) {
     return group;
 }
 
+/**
+ * method that calls when the window is loaded
+ */
 window.onload = function () {
     let camera, scene, renderer, canvas;
     let cameraControls;
 
     let worldObjects = {};
 
+    /**
+     * function that initializes the world
+     * @param array unsure
+     * @param offset unsure
+     */
     function init(array, offset) {
+        //region Camera
         camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
         cameraControls = new THREE.OrbitControls(camera);
         cameraControls.target.set(15,5,15);
@@ -41,9 +56,10 @@ window.onload = function () {
         camera.position.x = 15;
 
         cameraControls.update();
+        //endregion
 
-
-
+        //sets canvas and renderer
+        //region canvas
         scene = new THREE.Scene();
 
         canvas = document.querySelector('#view');
@@ -51,9 +67,12 @@ window.onload = function () {
         renderer.outputEncoding = THREE.sRGBEncoding;
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight + 5);
+        //endregion
 
+        //adds event listener to call the window resize function
         window.addEventListener('resize', onWindowResize, false);
 
+        //Sets all the models and meshes to form the background, adds them to scene
         //region Background
         const geometry = new THREE.PlaneGeometry(30, 30);
         const groundmaterial = new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load("textures/concrete_floor.jpg"), side: THREE.DoubleSide });
@@ -104,6 +123,8 @@ window.onload = function () {
         scene.add(worldgroup);
         //endregion
 
+        //Sets all the lights, their intensities, and locations, then adds them to scene
+        //region Lights
         const lightcolour = 0x404040;
         const pointlightintensity = 0.8;
         const pointlight = new THREE.PointLight(lightcolour, pointlightintensity,0,2);
@@ -123,20 +144,32 @@ window.onload = function () {
         const lightgroup = new THREE.Group();
         lightgroup.add(pointlight,pointlight2,pointlight3,pointlight4,pointlight5,amblight);
         scene.add(lightgroup);
+        //endregion
     }
 
+    /**
+     * resizes the view when window size changes
+     */
     function onWindowResize() {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
+    /**
+     * request animation frame from browser, updates camera controls, and renders the scene
+     */
     function animate() {
         requestAnimationFrame(animate);
         cameraControls.update();
         renderer.render(scene, camera);
     }
 
+    /**
+     * JSON parses a string
+     * @param input string to be parsed
+     * @returns {any} the JSON parsed string
+     */
     function parseCommand(input = "") {
         return JSON.parse(input);
     }
@@ -153,6 +186,7 @@ window.onload = function () {
 
         //Wanneer het commando is "object_update", dan wordt deze code uitgevoerd. Bekijk ook de servercode om dit goed te begrijpen.
         if (command.command === "object_update") {
+            console.log(command.command);
             //Wanneer het object dat moet worden geupdate nog niet bestaat (komt niet voor in de lijst met worldObjects op de client),
             //dan wordt het 3D model eerst aangemaakt in de 3D wereld.
             if (Object.keys(worldObjects).indexOf(command.parameters.uuid) < 0) {
@@ -274,7 +308,13 @@ window.onload = function () {
             object.rotation.x = command.parameters.rotationX;
             object.rotation.y = command.parameters.rotationY;
             object.rotation.z = command.parameters.rotationZ;
+        } else if (command.command === "object_remove"){
+            console.log("removing object: " + command.parameters.uuid);
+            scene.remove(worldObjects[command.parameters.uuid]);
+            worldObjects[command.parameters.uuid] = null;
+
         }
+
     }
 
     init();

@@ -5,6 +5,8 @@ import java.beans.PropertyChangeEvent;
 import com.nhlstenden.amazonsimulatie.base.Command;
 import com.nhlstenden.amazonsimulatie.models.Model;
 import com.nhlstenden.amazonsimulatie.models.Object3D;
+import com.nhlstenden.amazonsimulatie.models.Rack;
+import com.nhlstenden.amazonsimulatie.models.World;
 import com.nhlstenden.amazonsimulatie.views.View;
 
 /*
@@ -28,8 +30,16 @@ public class SimulationController extends Controller {
      */
     @Override
     public void run() {
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Model model = this.getModel();
+        World world = (World)model;
         while (true) {
-            this.getModel().update();
+            world.pickupRack();
+            model.update();
 
             try {
                 Thread.sleep(100);

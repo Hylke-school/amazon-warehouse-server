@@ -32,6 +32,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 @EnableWebSocket
 public class App extends SpringBootServletInitializer implements WebSocketConfigurer {
 
+    private World world;
     /*
      * De main methode regelt het starten van de Spring applicatie. Dit gebeurd
      * middels SpringApplication.run(). Deze zorgt ervoor dat onze App gerund
@@ -52,7 +53,7 @@ public class App extends SpringBootServletInitializer implements WebSocketConfig
     * SpringApplication.run().
     */
     public App() {
-        World world = new World(50,5);
+        world = new World(10,5);
         this.controller = new SimulationController(world);
         this.controller.start();
     }

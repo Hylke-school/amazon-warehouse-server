@@ -2,6 +2,7 @@ package com.nhlstenden.amazonsimulatie.models;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,6 +25,7 @@ public class World implements Model {
     private List<Object3D> worldObjects;
     private List<Robot> robotList;
     private List<Rack> rackList;
+    private boolean[][] rackLocations = new boolean[28][28];
 
     /*
      * Dit onderdeel is nodig om veranderingen in het model te kunnen doorgeven aan de controller.
@@ -39,10 +41,16 @@ public class World implements Model {
         this.worldObjects = new ArrayList<>();
         this.robotList = new ArrayList<>();
         this.rackList = new ArrayList<>();
+        for (int row = 0; row < rackLocations.length; row++) {
+            for (int col = 0; col < rackLocations[row].length; col++) {
+                rackLocations[row][col] = false;
+            }
+        }
 
         addRobots(amountRobots);
-
         populateRacks(percentageFilled);
+
+        addObject(new Truck());
     }
 
     /**
@@ -84,31 +92,28 @@ public class World implements Model {
                 }
             }
         }
+        updateRackLocations();
     }
 
     /**
      * goes through list of racks and robots, and assigns racks to robots.
      * sleeps 100 ms to prevent resource usage
      */
-    public void pickupRacks(){
+    public void pickupRack() {
         int[] dropoffLocation;
-        while(rackList.size() != 0){
-            for(int i = 0; i < rackList.size(); i++){
-                for(Robot robot : robotList){
-                    if(!robot.isBusy()&&!rackList.get(i).isBusy()){
-                        dropoffLocation = getDropoffLocation();
-                        if(dropoffLocation != null){
-                            if(robot.pickup(rackList.get(i),dropoffLocation[0],dropoffLocation[1])){
-                                removeRack(rackList.get(i));
-                            }
+        int racklistsize = rackList.size();
+        if (racklistsize != 0) {
+            Rack rack = rackList.get(0);
+            for (Robot robot : robotList) {
+                if (racklistsize != 0 && !robot.isBusy() && !rack.isBusy()) {
+                    dropoffLocation = getDropoffLocation();
+                    if (dropoffLocation != null) {
+                        if (robot.pickup(rack, dropoffLocation[0], dropoffLocation[1])) {
+                            removeRack(rack);
+                            racklistsize--;
                         }
                     }
                 }
-            }
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
         }
     }
@@ -121,38 +126,39 @@ public class World implements Model {
         try{
             rackList.remove(rack);
             worldObjects.remove(rack);
+            updateRackLocations();
+            if (((Updatable)rack).update()) {
+                pcs.firePropertyChange(Model.REMOVE_COMMAND,null, new ProxyObject3D(rack));
+            }
         } catch (NullPointerException e){
             e.printStackTrace();
         }
     }
 
-    public int[] getDropoffLocation() {
-        boolean[][] rackLocations = new boolean[28][28];
-        for (int row = 0; row < rackLocations.length; row++) {
-            for (int col = 0; col < rackLocations[row].length; col++) {
-                rackLocations[row][col] = false;
-            }
-        }
-
-        int[] dropoffLocation = new int[]{};
-        int x, z;
-
+    public void updateRackLocations(){
+        int x,z;
         for(Rack rack : rackList){
             x = (int)rack.getX();
             z = (int)rack.getZ();
-            for (int i = 1; i <= 28; i++) {
-                for (int j = 1; j <= 28; j++) {
+            for (int i = 0; i < 28; i++) {
+                for (int j = 0; j < 28; j++) {
                     if(x==i&&z==j){
                         rackLocations[i][j] = true;
                     }
                 }
             }
         }
-        for(int i = 26; i <= 28; i++){
-            for(int j = 2; i <= 28; j++){
+    }
+
+    public int[] getDropoffLocation() {
+        int[] dropoffLocation = new int[2];
+
+        outer: for(int i = 25; i < 28; i++){
+            for(int j = 1; j < 28; j++){
                 if(!rackLocations[i][j]){
                     dropoffLocation[0] = i;
                     dropoffLocation[1] = j;
+                    break outer;
                 }
             }
         }
