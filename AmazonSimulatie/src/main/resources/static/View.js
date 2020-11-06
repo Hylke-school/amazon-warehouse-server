@@ -187,6 +187,7 @@ window.onload = function () {
         //Wanneer het commando is "object_update", dan wordt deze code uitgevoerd. Bekijk ook de servercode om dit goed te begrijpen.
         if (command.command === "object_update") {
             console.log(command.command);
+            console.log(command.parameters.type);
             //Wanneer het object dat moet worden geupdate nog niet bestaat (komt niet voor in de lijst met worldObjects op de client),
             //dan wordt het 3D model eerst aangemaakt in de 3D wereld.
             if (Object.keys(worldObjects).indexOf(command.parameters.uuid) < 0) {
@@ -309,7 +310,6 @@ window.onload = function () {
             object.rotation.y = command.parameters.rotationY;
             object.rotation.z = command.parameters.rotationZ;
         } else if (command.command === "object_remove"){
-            console.log("removing object: " + command.parameters.uuid);
             scene.remove(worldObjects[command.parameters.uuid]);
             worldObjects[command.parameters.uuid] = null;
 

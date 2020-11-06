@@ -1,5 +1,7 @@
 package com.nhlstenden.amazonsimulatie.models;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.UUID;
 
 /*
@@ -7,8 +9,9 @@ import java.util.UUID;
  * 3D object is. Ook implementeerd deze class de interface Updatable. Dit is omdat
  * een robot geupdate kan worden binnen de 3D wereld om zich zo voort te bewegen.
  */
-class Robot implements Object3D, Updatable {
+public class Robot implements Object3D, Updatable {
     private UUID uuid;
+    private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
     private double x;
     private double y;
@@ -57,6 +60,7 @@ class Robot implements Object3D, Updatable {
      */
     @Override
     public boolean update() {
+
         if(child != null){
             child.setX(this.x);
             child.setY(this.y+0.15);
@@ -64,9 +68,12 @@ class Robot implements Object3D, Updatable {
             child.setRotationX(this.rotationX);
             child.setRotationY(this.rotationY);
             child.setRotationZ(this.rotationZ);
-        }
-        return true;
+            return true;
+        } else return false;
+
     }
+
+    public void addObserver(PropertyChangeListener pcl){pcs.addPropertyChangeListener(pcl);}
 
     /**
      * sets a rack to be child of a robot

@@ -1,9 +1,12 @@
 package com.nhlstenden.amazonsimulatie.models;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.UUID;
 
 public class Rack implements Object3D, Updatable {
     private UUID uuid;
+    private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
     private double x = 0;
     private double y = 0;
@@ -33,6 +36,10 @@ public class Rack implements Object3D, Updatable {
         this.rotationY = rotationY;
         this.rotationZ = rotationZ;
         this.uuid = UUID.randomUUID();
+    }
+
+    public void addObserver(PropertyChangeListener pcl) {
+        pcs.addPropertyChangeListener(pcl);
     }
 
     /**

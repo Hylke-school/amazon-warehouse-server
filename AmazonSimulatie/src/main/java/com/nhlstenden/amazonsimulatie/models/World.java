@@ -1,5 +1,7 @@
 package com.nhlstenden.amazonsimulatie.models;
 
+import com.nhlstenden.amazonsimulatie.controllers.RobotController;
+
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.lang.reflect.Proxy;
@@ -23,15 +25,13 @@ public class World implements Model {
      * een lijst van Object3D onderdelen. Deze kunnen in principe alles zijn. (Robots, vrachrtwagens, etc)
      */
     private List<Object3D> worldObjects;
-    private List<Robot> robotList;
-    private List<Rack> rackList;
-    private boolean[][] rackLocations = new boolean[28][28];
 
     /*
      * Dit onderdeel is nodig om veranderingen in het model te kunnen doorgeven aan de controller.
      * Het systeem werkt al as-is, dus dit hoeft niet aangepast te worden.
      */
     PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    RobotController robotController;
 
     /*
      * De wereld maakt een lege lijst voor worldObjects aan. Daarin wordt nu één robot gestopt.
@@ -39,18 +39,16 @@ public class World implements Model {
      */
     public World(int percentageFilled, int amountRobots) {
         this.worldObjects = new ArrayList<>();
-        this.robotList = new ArrayList<>();
-        this.rackList = new ArrayList<>();
-        for (int row = 0; row < rackLocations.length; row++) {
-            for (int col = 0; col < rackLocations[row].length; col++) {
-                rackLocations[row][col] = false;
-            }
+        robotController = new RobotController(percentageFilled,amountRobots);
+
+        for (Rack rack : robotController.getRackList()){
+            addObject(rack);
         }
 
-        addRobots(amountRobots);
-        populateRacks(percentageFilled);
+        for(Robot robot : robotController.getRobotList()){
+            addObject(robot);
+        }
 
-        addObject(new Truck());
     }
 
     /**
@@ -59,40 +57,7 @@ public class World implements Model {
      * @param object object to be added
      */
     public void addObject(Object3D object){
-        if(object instanceof Robot){
-            robotList.add((Robot)object);
-        }else if(object instanceof Rack){
-            rackList.add((Rack)object);
-        }
         this.worldObjects.add(object);
-    }
-    public void addRobots(int amountRobots){
-        for(int i = 1; i <= amountRobots; i++){
-            if(i <= 29){
-                addObject(new Robot(29,i));
-            } else{
-                addObject(new Robot(28, i-29));
-            }
-        }
-    }
-
-    /**
-     * populates the grid randomly with storage racks, only in permitted areas
-     * @param percentage percentage of slots to be filled with storage racks
-     */
-    public void populateRacks(int percentage){
-        Random random = new Random();
-        boolean checkgrid,checkrandom;
-        for (int i = 2; i < 25; i++){
-            for (int j = 2; j < 29; j++){
-                checkrandom = random.nextInt(100)+1 <= percentage;
-                checkgrid = !(i==4||i==7||i==10||i==13||i==16||i==19||i==22||j==15);
-                if(checkrandom&&checkgrid){
-                    addObject(new Rack(i,j));
-                }
-            }
-        }
-        updateRackLocations();
     }
 
     /**
@@ -100,70 +65,17 @@ public class World implements Model {
      * sleeps 100 ms to prevent resource usage
      */
     public void pickupRack() {
-        int[] dropoffLocation;
-        int racklistsize = rackList.size();
-        if (racklistsize != 0) {
-            Rack rack = rackList.get(0);
-            for (Robot robot : robotList) {
-                if (racklistsize != 0 && !robot.isBusy() && !rack.isBusy()) {
-                    dropoffLocation = getDropoffLocation();
-                    if (dropoffLocation != null) {
-                        if (robot.pickup(rack, dropoffLocation[0], dropoffLocation[1])) {
-                            removeRack(rack);
-                            racklistsize--;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * removes rack from rackList, checks if the rack isn't null
-     * @param rack rack to be removed
-     */
-    public void removeRack(Rack rack){
-        try{
-            rackList.remove(rack);
+        Rack rack = robotController.pickupRack();
+        if(rack != null) {
             worldObjects.remove(rack);
-            updateRackLocations();
-            if (((Updatable)rack).update()) {
-                pcs.firePropertyChange(Model.REMOVE_COMMAND,null, new ProxyObject3D(rack));
-            }
-        } catch (NullPointerException e){
-            e.printStackTrace();
-        }
-    }
-
-    public void updateRackLocations(){
-        int x,z;
-        for(Rack rack : rackList){
-            x = (int)rack.getX();
-            z = (int)rack.getZ();
-            for (int i = 0; i < 28; i++) {
-                for (int j = 0; j < 28; j++) {
-                    if(x==i&&z==j){
-                        rackLocations[i][j] = true;
-                    }
+            try {
+                if (rack.update()) {
+                    pcs.firePropertyChange(Model.REMOVE_COMMAND, null, new ProxyObject3D(rack));
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
-    }
-
-    public int[] getDropoffLocation() {
-        int[] dropoffLocation = new int[2];
-
-        outer: for(int i = 25; i < 28; i++){
-            for(int j = 1; j < 28; j++){
-                if(!rackLocations[i][j]){
-                    dropoffLocation[0] = i;
-                    dropoffLocation[1] = j;
-                    break outer;
-                }
-            }
-        }
-
-        return dropoffLocation;
     }
 
     /*
