@@ -1,5 +1,6 @@
 package com.nhlstenden.amazonsimulatie.models;
 
+import com.nhlstenden.amazonsimulatie.controllers.GraphController;
 import com.nhlstenden.amazonsimulatie.controllers.RobotController;
 
 import java.beans.PropertyChangeListener;
@@ -31,6 +32,7 @@ public class World implements Model {
      */
     PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     LoadingBayController lbc = new LoadingBayController();
+    GraphController graph = new GraphController();
     RobotController robotController;
 
     /**
@@ -43,6 +45,7 @@ public class World implements Model {
     public World(int percentageFilled, int amountRobots) {
         this.worldObjects = new ArrayList<>();
         robotController = new RobotController(percentageFilled,amountRobots);
+        graph.populateGraph();
 
         for (Truck truck : lbc.truckList) {
             addObject(truck);

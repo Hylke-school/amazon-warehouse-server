@@ -1,14 +1,45 @@
-package com.nhlstenden.amazonsimulatie.models;
+package com.nhlstenden.amazonsimulatie.controllers;
+
+import com.nhlstenden.amazonsimulatie.models.EdgeWeighted;
+import com.nhlstenden.amazonsimulatie.models.NodeWeighted;
 
 import java.util.*;
 
-public class GraphWeighted {
+public class GraphController {
     /** lijst met nodes in de graaf */
     private Set<NodeWeighted> nodes;
 
-    /** consturctor van de graaf, maakt een lege lijst met nodes aan */
-    public GraphWeighted(){
+    /** lijst met nodes in een array */
+    private NodeWeighted[][] nodeArray = new NodeWeighted[32][32];
+
+    /** constructor van de graaf, maakt een lege lijst met nodes aan */
+    public GraphController(){
         nodes = new HashSet<>();
+    }
+
+    /** @return de array van nodes */
+    public NodeWeighted[][] getNodeArray(){
+        return nodeArray;
+    }
+
+    /** een functie die gebruikt wordt om de node graaf te maken */
+    public void populateGraph(){
+        for (int i = 2; i <= 31; i++){
+            for (int j = 2; j <= 31; j++){
+                this.nodeArray[i][j] = new NodeWeighted("(" + i + ";" + j + ")", i, j);
+            }
+        }
+
+        for (int i = 2; i <= 31; i++){
+            for (int j = 2; j <= 31; j++){
+                if (i == 2 || i == 5 || i == 8|| i == 11|| i == 14|| i == 17|| i == 20 || (i >=23 && i<= 30)){
+                    this.addEdge(nodeArray[i][j], nodeArray[i+1][j], 1);
+                }
+                if (!(j == 3 || j == 6 || j == 9 || j == 12 || j == 15|| j == 18 || j == 21 || j == 24) && j <= 30){
+                    this.addEdge(nodeArray[i][j], nodeArray[i][j+1], 1);
+                }
+            }
+        }
     }
 
     /**
