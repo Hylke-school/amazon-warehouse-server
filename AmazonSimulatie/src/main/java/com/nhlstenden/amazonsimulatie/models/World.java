@@ -4,11 +4,8 @@ import com.nhlstenden.amazonsimulatie.controllers.RobotController;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 import com.nhlstenden.amazonsimulatie.controllers.LoadingBayController;
 
@@ -45,11 +42,11 @@ public class World implements Model {
      */
     public World(int percentageFilled, int amountRobots) {
         this.worldObjects = new ArrayList<>();
-        this.worldObjects.add(new Robot());
+        robotController = new RobotController(percentageFilled,amountRobots);
 
         for (Truck truck : lbc.truckList) {
-            this.worldObjects.add(truck);
-        robotController = new RobotController(percentageFilled,amountRobots);
+            addObject(truck);
+        }
 
         for (Rack rack : robotController.getRackList()){
             addObject(rack);
