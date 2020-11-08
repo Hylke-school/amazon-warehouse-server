@@ -87,7 +87,7 @@ public class GraphWeighted {
             currentNode.visit();
 
             for (EdgeWeighted edge: currentNode.getEdges()) {
-                if (edge.getDestination().isVisited()){
+                if (edge.getDestination().isVisited() || edge.getDestination().isOccupied()){
                     continue;
                 }
 
