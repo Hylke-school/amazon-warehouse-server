@@ -25,6 +25,10 @@ public class LoadingBayController implements Runnable, PropertyChangeListener {
         addTruck(20);
     }
 
+    /**
+     * "Update" function of the LoadingBayController
+     * Checks if there are packages that can be put into the truck
+     */
     @Override
     public void run() {
         while (true) {
@@ -68,9 +72,20 @@ public class LoadingBayController implements Runnable, PropertyChangeListener {
         }
     }
 
+    /**
+     * When there is a robot to pick up a rack, call this function
+     */
     private void loadRackOnRobot() {
         rackAmount--;
         //TODO: Make the robot's pick up a package when there is one
+    }
+
+    /**
+     * When there is a robot that brings a package to the loading bay, call this function
+     */
+    private void loadPackageOffRobot() {
+        packageAmount++;
+        //TODO: Make the robot drop packages too the loadingbay
     }
 
     /**
@@ -99,6 +114,11 @@ public class LoadingBayController implements Runnable, PropertyChangeListener {
         truck.sendTruckToRoad();
     }
 
+    /**
+     * Receive messages from senders
+     * When there arived a truck at the bay, and this one is empty, call truckAvailable
+     * When the truck is full of packages, send the truck back on the road
+     */
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         Truck sendingTruck = (Truck) evt.getSource();
