@@ -1,3 +1,12 @@
+/**
+ * The Truck script is the logic behind the truck.
+ * It communicates with the LoadaingBay to check what it's supossed to do.
+ * Furthermore is it an 3D-object and can be updated by the world
+ * 
+ * @author  Berber Bouma
+ * @version 1.0
+ * @since   2020-11-08
+ */
 package com.nhlstenden.amazonsimulatie.models;
 
 import java.beans.PropertyChangeListener;

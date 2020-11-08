@@ -1,3 +1,11 @@
+/**
+ * The LoadingBayController script is a way to let the robots and trucks work together.
+ * By using a central script to check and control the trucks to prevent unnecessary code
+ * 
+ * @author  Berber Bouma
+ * @version 1.0
+ * @since   2020-11-08
+ */
 package com.nhlstenden.amazonsimulatie.controllers;
 
 import java.beans.PropertyChangeEvent;
