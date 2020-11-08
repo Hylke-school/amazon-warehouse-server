@@ -21,6 +21,8 @@ public class Robot implements Object3D, Updatable {
     private double rotationY;
     private double rotationZ;
 
+    private boolean hasChanged = false;
+
     public Rack child;
 
     public Robot() {
@@ -68,6 +70,8 @@ public class Robot implements Object3D, Updatable {
             child.setRotationX(this.rotationX);
             child.setRotationY(this.rotationY);
             child.setRotationZ(this.rotationZ);
+            return true;
+        } else if (hasChanged){
             return true;
         } else return false;
 

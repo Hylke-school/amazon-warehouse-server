@@ -9,16 +9,20 @@ import java.util.Random;
 
 import com.nhlstenden.amazonsimulatie.models.*;
 
-public class RobotController implements Runnable, PropertyChangeListener {
+public class RobotController {
     private List<Robot> robotList;
     private List<Rack> rackList;
     private boolean[][] rackLocations = new boolean[28][28];
 
     PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
+    /**
+     * constructs object, sets rackLocations array to false
+     * puts racks and robots in the world
+     * @param populateRacksPercentage the percentage of rack slots to be filled
+     * @param amountRobots the amount of robots to be added
+     */
     public RobotController(int populateRacksPercentage, int amountRobots) {
-        new Thread(this).start();
-
         robotList = new ArrayList<>();
         rackList = new ArrayList<>();
 
@@ -32,16 +36,74 @@ public class RobotController implements Runnable, PropertyChangeListener {
         populateRacks(populateRacksPercentage);
     }
 
-    public List<Rack> getRackList(){
-        return rackList;
-    }
-
-    public List<Robot> getRobotList(){
-        return robotList;
+    /**
+     * makes a robot, adds an observer, and adds it to the robotlist
+     * @param x x location of the robot
+     * @param z z location of the robot
+     */
+    public void addRobot(int x, int  z){
+        Robot robot = new Robot(x,z);
+        robotList.add(robot);
     }
 
     /**
-     * goes through list of racks and robots, and assigns racks to robots.
+     * makes a rack, adds an observer, and adds it to the racklist
+     * @param x x location of the rack
+     * @param z z location of the rack
+     */
+    public void addRack(int x, int z){
+        Rack rack = new Rack(x,z);
+        rackList.add(rack);
+    }
+
+    /**
+     * removes rack from rackList, updates racklocations
+     * @param rack rack to be removed
+     */
+    public void removeRack(Rack rack){
+        try{
+            rackList.remove(rack);
+            updateRackLocations();
+        } catch (NullPointerException e){
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * adds the specified amount of robots to the robot spawning area, maximum of 58 robots
+     * @param amountRobots amount of robots to be added
+     */
+    public void populateRobots(int amountRobots){
+        for(int i = 1; i <= amountRobots; i++){
+            if(i <= 29){
+                addRobot(29,i);
+            } else{
+                addRobot(28, i-29);
+            }
+        }
+    }
+
+    /**
+     * populates the grid randomly with storage racks, only in permitted areas
+     * @param percentage percentage of slots to be filled with storage racks
+     */
+    public void populateRacks(int percentage){
+        Random random = new Random();
+        boolean checkgrid,checkrandom;
+        for (int i = 2; i < 25; i++){
+            for (int j = 2; j < 29; j++){
+                checkrandom = random.nextInt(100)+1 <= percentage;
+                checkgrid = !(i==4||i==7||i==10||i==13||i==16||i==19||i==22||j==15);
+                if(checkrandom&&checkgrid){
+                    addRack(i,j);
+                }
+            }
+        }
+    }
+
+    /**
+     * takes the first rack from the racklist, checks if any robots are available to pick it up, then picks it up
+     * once the robot puts down the rack, delete the rack
      */
     public Rack pickupRack() {
         int[] dropoffLocation;
@@ -64,6 +126,9 @@ public class RobotController implements Runnable, PropertyChangeListener {
         return null;
     }
 
+    /**
+     * goes through the racklist, checks locations, and sets racklocations accordingly
+     */
     public void updateRackLocations(){
         int x,z;
         for(Rack rack : rackList){
@@ -80,21 +145,9 @@ public class RobotController implements Runnable, PropertyChangeListener {
     }
 
     /**
-     * removes rack from rackList, checks if the rack isn't null
-     * @param rack rack to be removed
+     * goes through the dropoff area, and checks if there are any racks there, if not, sets the dropofflocation to the first available slot
+     * @return dropofflocation, with x and z
      */
-    public void removeRack(Rack rack){
-        try{
-            rackList.remove(rack);
-            updateRackLocations();
-            if (rack.update()) {
-                pcs.firePropertyChange(Model.REMOVE_COMMAND,null, new ProxyObject3D(rack));
-            }
-        } catch (NullPointerException e){
-            e.printStackTrace();
-        }
-    }
-
     public int[] getDropoffLocation() {
         int[] dropoffLocation = new int[2];
 
@@ -111,60 +164,14 @@ public class RobotController implements Runnable, PropertyChangeListener {
         return dropoffLocation;
     }
 
-    public void addRobot(int x, int  z){
-        Robot robot = new Robot(x,z);
-        robot.addObserver(this);
-        robotList.add(robot);
+    //returns rackList
+    public List<Rack> getRackList(){
+        return rackList;
     }
 
-    public void populateRobots(int amountRobots){
-        for(int i = 1; i <= amountRobots; i++){
-            if(i <= 29){
-                addRobot(29,i);
-            } else{
-                addRobot(28, i-29);
-            }
-        }
+    //returns robotList
+    public List<Robot> getRobotList(){
+        return robotList;
     }
 
-    public void addRack(int x, int z){
-        Rack rack = new Rack(x,z);
-        rack.addObserver(this);
-        rackList.add(rack);
-    }
-
-    /**
-     * populates the grid randomly with storage racks, only in permitted areas
-     * @param percentage percentage of slots to be filled with storage racks
-     */
-    public void populateRacks(int percentage){
-        Random random = new Random();
-        boolean checkgrid,checkrandom;
-        for (int i = 2; i < 25; i++){
-            for (int j = 2; j < 29; j++){
-                checkrandom = random.nextInt(100)+1 <= percentage;
-                checkgrid = !(i==4||i==7||i==10||i==13||i==16||i==19||i==22||j==15);
-                if(checkrandom&&checkgrid){
-                    addRack(i,j);
-                }
-            }
-        }
-    }
-
-    @Override
-    public void run() {
-        while (true) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-    }
-
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-
-    }
 }

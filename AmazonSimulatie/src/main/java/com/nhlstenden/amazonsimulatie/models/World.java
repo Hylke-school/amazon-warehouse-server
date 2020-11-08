@@ -33,9 +33,12 @@ public class World implements Model {
     PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     RobotController robotController;
 
-    /*
-     * De wereld maakt een lege lijst voor worldObjects aan. Daarin wordt nu één robot gestopt.
-     * Deze methode moet uitgebreid worden zodat alle objecten van de 3D wereld hier worden gemaakt.
+    /**
+     * initializes class,
+     * makes a robotController, gives percentageFilled and amountRobots
+     * gets racklist and robotlist from robotcontroller and adds them to world
+     * @param percentageFilled percentage of slots to be filled with racks
+     * @param amountRobots amount of robots to be added
      */
     public World(int percentageFilled, int amountRobots) {
         this.worldObjects = new ArrayList<>();
@@ -52,8 +55,7 @@ public class World implements Model {
     }
 
     /**
-     * takes an Object3D object, checks if it's an instance of robot or rack, and adds to respective list
-     * then adds the object to the worldobjects list to be rendered
+     * takes an Object3D object, and adds it to the worldObjects list
      * @param object object to be added
      */
     public void addObject(Object3D object){
@@ -61,8 +63,7 @@ public class World implements Model {
     }
 
     /**
-     * goes through list of racks and robots, and assigns racks to robots.
-     * sleeps 100 ms to prevent resource usage
+     * calls pickupRack method on robotController, fires remove command to server on the object that gets removed
      */
     public void pickupRack() {
         Rack rack = robotController.pickupRack();
