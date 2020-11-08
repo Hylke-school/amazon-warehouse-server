@@ -20,8 +20,8 @@ public class LoadingBayController implements Runnable, PropertyChangeListener {
 
     private List<Truck> atBay = new ArrayList<Truck>();
 
-    private double bayLocation = 0;
-    private double roadLocation = -20;
+    private double bayLocation = -15;
+    private double roadLocation = -30;
 
     private int rackAmount = 50;
     private int packageAmount = 50;
