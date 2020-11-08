@@ -1,5 +1,7 @@
 package com.nhlstenden.amazonsimulatie.models;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.UUID;
 
 /*
@@ -7,18 +9,41 @@ import java.util.UUID;
  * 3D object is. Ook implementeerd deze class de interface Updatable. Dit is omdat
  * een robot geupdate kan worden binnen de 3D wereld om zich zo voort te bewegen.
  */
-class Robot implements Object3D, Updatable {
+public class Robot implements Object3D, Updatable {
     private UUID uuid;
+    private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
-    private double x = 0;
-    private double y = 0;
-    private double z = 0;
+    private double x;
+    private double y;
+    private double z;
 
-    private double rotationX = 0;
-    private double rotationY = 0;
-    private double rotationZ = 0;
+    private double rotationX;
+    private double rotationY;
+    private double rotationZ;
+
+    private boolean hasChanged = false;
+
+    public Rack child;
 
     public Robot() {
+        this(0, 0.15, 0, 0, 0, 0);
+    }
+    public Robot(double x, double z){
+        this(x,0.15,z,0,0,0);
+    }
+    public Robot(double x, double y, double z){
+        this(x,y,z,0,0,0);
+    }
+    public Robot(double x, double z, double rotationX, double rotationZ){
+        this(x,0.15,z,rotationX,0,rotationZ);
+    }
+    public Robot(double x, double y, double z, double rotationX, double rotationY, double rotationZ){
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.rotationX = rotationX;
+        this.rotationY = rotationY;
+        this.rotationZ = rotationZ;
         this.uuid = UUID.randomUUID();
     }
 
@@ -37,12 +62,74 @@ class Robot implements Object3D, Updatable {
      */
     @Override
     public boolean update() {
-        if(x < 15) {
-            this.x += 0.5;
-        } else {
-            this.z += 0.5;
+
+        if(child != null){
+            child.setX(this.x);
+            child.setY(this.y+0.15);
+            child.setZ(this.z);
+            child.setRotationX(this.rotationX);
+            child.setRotationY(this.rotationY);
+            child.setRotationZ(this.rotationZ);
+            return true;
+        } else if (hasChanged){
+            return true;
+        } else return false;
+
+    }
+
+    public void addObserver(PropertyChangeListener pcl){pcs.addPropertyChangeListener(pcl);}
+
+    /**
+     * sets a rack to be child of a robot
+     * @param child rack to become a child
+     */
+    public void setChild(Rack child){
+        this.child = child;
+    }
+
+    /**
+     * removes rack from robot
+     */
+    public void removeChild(){
+        if(child != null){
+            child.setY(0);
         }
-        
+        child = null;
+    }
+
+    /**
+     * to be implemented, returns boolean true if the robot is not available for picking up a new rack
+     * @return boolean: true if robot is busy
+     */
+    public boolean isBusy(){
+        return false;
+    }
+
+    /**
+     * to be implemented, maneuvers robot to rack, and picks it up, then delivers to the truck
+     * @param rack the rack to be picked up
+     */
+    public boolean pickup(Rack rack, int dropoffX, int dropoffZ){
+        double x = rack.getX();
+        double z = rack.getZ();
+        if(moveTo(x,z)) {
+            setChild(rack);
+            if(moveTo(dropoffX,dropoffZ)){
+                removeChild();
+                return true;
+            } else return false;
+        } else return false;
+    }
+
+
+    /**
+     * moves robot to a place, uses pathfinding
+     * @param x x coordinate to move to
+     * @param z z coordinate to move to
+     * @return true once the move has finished
+     */
+    private boolean moveTo(double x, double z) {
+        System.out.printf("x: %s z: %s\n", x, z);
         return true;
     }
 

@@ -16,6 +16,7 @@ public interface Model {
      * is voor alle models.
      */
     static final String UPDATE_COMMAND = "object_update";
+    static final String REMOVE_COMMAND = "object_remove";
 
     /*
      * Alle models moeten kunnen updaten en een observer kunnen toevoegen.

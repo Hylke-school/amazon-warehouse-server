@@ -1,9 +1,14 @@
 package com.nhlstenden.amazonsimulatie.models;
 
+import com.nhlstenden.amazonsimulatie.controllers.RobotController;
+
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import com.nhlstenden.amazonsimulatie.controllers.LoadingBayController;
 
@@ -29,17 +34,55 @@ public class World implements Model {
      */
     PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     LoadingBayController lbc = new LoadingBayController();
+    RobotController robotController;
 
-    /*
-     * De wereld maakt een lege lijst voor worldObjects aan. Daarin wordt nu één robot gestopt.
-     * Deze methode moet uitgebreid worden zodat alle objecten van de 3D wereld hier worden gemaakt.
+    /**
+     * initializes class,
+     * makes a robotController, gives percentageFilled and amountRobots
+     * gets racklist and robotlist from robotcontroller and adds them to world
+     * @param percentageFilled percentage of slots to be filled with racks
+     * @param amountRobots amount of robots to be added
      */
-    public World() {
+    public World(int percentageFilled, int amountRobots) {
         this.worldObjects = new ArrayList<>();
         this.worldObjects.add(new Robot());
 
         for (Truck truck : lbc.truckList) {
             this.worldObjects.add(truck);
+        robotController = new RobotController(percentageFilled,amountRobots);
+
+        for (Rack rack : robotController.getRackList()){
+            addObject(rack);
+        }
+
+        for(Robot robot : robotController.getRobotList()){
+            addObject(robot);
+        }
+
+    }
+
+    /**
+     * takes an Object3D object, and adds it to the worldObjects list
+     * @param object object to be added
+     */
+    public void addObject(Object3D object){
+        this.worldObjects.add(object);
+    }
+
+    /**
+     * calls pickupRack method on robotController, fires remove command to server on the object that gets removed
+     */
+    public void pickupRack() {
+        Rack rack = robotController.pickupRack();
+        if(rack != null) {
+            worldObjects.remove(rack);
+            try {
+                if (rack.update()) {
+                    pcs.firePropertyChange(Model.REMOVE_COMMAND, null, new ProxyObject3D(rack));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

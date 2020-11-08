@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.nhlstenden.amazonsimulatie.models.Model;
+import com.nhlstenden.amazonsimulatie.models.World;
 import com.nhlstenden.amazonsimulatie.views.View;
 
 /*
@@ -65,7 +66,7 @@ public abstract class Controller implements Runnable, PropertyChangeListener {
      * Method to start the controller in a new thread.
      */
     public final void start() {
-        new Thread(this).start();;
+        new Thread(this).start();
     }
 
     public abstract void run();

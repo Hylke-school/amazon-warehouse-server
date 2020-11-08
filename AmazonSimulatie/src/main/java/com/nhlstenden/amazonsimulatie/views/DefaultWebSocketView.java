@@ -17,11 +17,11 @@ import org.springframework.web.socket.WebSocketSession;
  * waarmee de view class kan communiceren met de browser.
  */
 public class DefaultWebSocketView implements View {
-    private WebSocketSession sesion;
+    private WebSocketSession session;
     private Command onClose;
 
-    public DefaultWebSocketView(WebSocketSession sesion) {
-        this.sesion = sesion;
+    public DefaultWebSocketView(WebSocketSession session) {
+        this.session = session;
     }
 
     /*
@@ -33,8 +33,8 @@ public class DefaultWebSocketView implements View {
     @Override
     public void update(String event, Object3D data) {
         try {
-            if(this.sesion.isOpen()) {
-                this.sesion.sendMessage(new TextMessage("{"
+            if(this.session.isOpen()) {
+                this.session.sendMessage(new TextMessage("{"
                 + surroundString("command") + ": " + surroundString(event) + ","
                 + surroundString("parameters") + ": " + jsonifyObject3D(data)
               + "}"));
