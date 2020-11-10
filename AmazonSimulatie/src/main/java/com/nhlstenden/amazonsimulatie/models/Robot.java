@@ -62,7 +62,6 @@ public class Robot implements Object3D, Updatable {
      */
     @Override
     public boolean update() {
-
         if(child != null){
             child.setX(this.x);
             child.setY(this.y+0.15);
@@ -92,7 +91,9 @@ public class Robot implements Object3D, Updatable {
      */
     public void removeChild(){
         if(child != null){
+            child.setX(this.x);
             child.setY(0);
+            child.setZ(this.z);
         }
         child = null;
     }
@@ -129,7 +130,8 @@ public class Robot implements Object3D, Updatable {
      * @return true once the move has finished
      */
     private boolean moveTo(double x, double z) {
-        System.out.printf("x: %s z: %s\n", x, z);
+        this.x = x;
+        this.z = z;
         return true;
     }
 

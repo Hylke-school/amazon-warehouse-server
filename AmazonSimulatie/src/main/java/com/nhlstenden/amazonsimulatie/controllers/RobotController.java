@@ -12,7 +12,7 @@ import com.nhlstenden.amazonsimulatie.models.*;
 public class RobotController {
     private List<Robot> robotList;
     private List<Rack> rackList;
-    private boolean[][] rackLocations = new boolean[28][28];
+    private boolean[][] rackLocations = new boolean[30][30];
 
     PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
@@ -44,6 +44,7 @@ public class RobotController {
     public void addRobot(int x, int  z){
         Robot robot = new Robot(x,z);
         robotList.add(robot);
+        updateRackLocations();
     }
 
     /**
@@ -54,6 +55,14 @@ public class RobotController {
     public void addRack(int x, int z){
         Rack rack = new Rack(x,z);
         rackList.add(rack);
+        updateRackLocations();
+    }
+
+    public void addRack(boolean fromTruck){
+        int[] dropoffLocation = getDropoffLocation(fromTruck);
+        Rack rack = new Rack(dropoffLocation[0],dropoffLocation[1],fromTruck);
+        rackList.add(rack);
+        updateRackLocations();
     }
 
     /**
@@ -110,14 +119,17 @@ public class RobotController {
         int racklistsize = rackList.size();
         if(racklistsize != 0){
             Rack rack = rackList.get(0);
+            boolean fromTruck = rack.getFromTruck();
             for (Robot robot : robotList) {
-                if (racklistsize != 0 && !robot.isBusy() && !rack.isBusy()) {
-                    dropoffLocation = getDropoffLocation();
+                if (!robot.isBusy() && !rack.isBusy()) {
+                    dropoffLocation = getDropoffLocation(fromTruck);
                     if (dropoffLocation != null) {
-                        if (robot.pickup(rack, dropoffLocation[0], dropoffLocation[1])) {
+                        robot.pickup(rack, dropoffLocation[0],dropoffLocation[1]);
+                        if(!fromTruck){
                             removeRack(rack);
-                            racklistsize--;
                             return rack;
+                        } else {
+                            rack.setFromTruck(false);
                         }
                     }
                 }
@@ -131,32 +143,52 @@ public class RobotController {
      */
     public void updateRackLocations(){
         int x,z;
-        for(Rack rack : rackList){
-            x = (int)rack.getX();
-            z = (int)rack.getZ();
-            for (int i = 0; i < 28; i++) {
-                for (int j = 0; j < 28; j++) {
-                    if(x==i&&z==j){
+        boolean hasChanged = false;
+        for (int i = 0; i < 30; i++) {
+            for (int j = 0; j < 30; j++) {
+                for(Rack rack : rackList){
+                    x = (int)rack.getX();
+                    z = (int)rack.getZ();
+                    if(i==x&&j==z){
                         rackLocations[i][j] = true;
+                        hasChanged = true;
                     }
                 }
+                if(!hasChanged) rackLocations[i][j] = false;
             }
         }
+
     }
 
     /**
      * goes through the dropoff area, and checks if there are any racks there, if not, sets the dropofflocation to the first available slot
      * @return dropofflocation, with x and z
      */
-    public int[] getDropoffLocation() {
-        int[] dropoffLocation = new int[2];
+    public int[] getDropoffLocation(boolean fromTruck) {
+        int[] dropoffLocation = null;
 
-        outer: for(int i = 25; i < 28; i++){
-            for(int j = 1; j < 28; j++){
-                if(!rackLocations[i][j]){
-                    dropoffLocation[0] = i;
-                    dropoffLocation[1] = j;
-                    break outer;
+        if(!fromTruck){
+            outer: for(int i = 26; i < 29; i++){
+                for(int j = 2; j < 29; j++){
+                    if(!rackLocations[i][j]){
+                        dropoffLocation = new int[2];
+                        dropoffLocation[0] = i;
+                        dropoffLocation[1] = j;
+                        break outer;
+                    }
+                }
+            }
+        } else {
+            boolean checkgrid;
+            outer: for (int i = 2; i < 25; i++){
+                for (int j = 2; j < 29; j++){
+                    checkgrid = !(i==4||i==7||i==10||i==13||i==16||i==19||i==22||j==15);
+                    if(checkgrid){
+                        dropoffLocation = new int[2];
+                        dropoffLocation[0] = i;
+                        dropoffLocation[1] = j;
+                        break outer;
+                    }
                 }
             }
         }

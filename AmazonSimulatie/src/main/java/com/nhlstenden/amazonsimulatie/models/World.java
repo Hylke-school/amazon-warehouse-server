@@ -73,15 +73,18 @@ public class World implements Model {
      * calls pickupRack method on robotController, fires remove command to server on the object that gets removed
      */
     public void pickupRack() {
-        Rack rack = robotController.pickupRack();
-        if(rack != null) {
-            worldObjects.remove(rack);
-            try {
-                if (rack.update()) {
-                    pcs.firePropertyChange(Model.REMOVE_COMMAND, null, new ProxyObject3D(rack));
+        if(lbc.getAtBaySize() > 0){
+            Rack rack = robotController.pickupRack();
+            if(rack != null) {
+                worldObjects.remove(rack);
+                lbc.loadPackageOffRobot();
+                try {
+                    if (rack.update()) {
+                        pcs.firePropertyChange(Model.REMOVE_COMMAND, null, new ProxyObject3D(rack));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         }
     }
@@ -104,6 +107,7 @@ public class World implements Model {
                 }
             }
         }
+        
     }
 
     /*

@@ -16,19 +16,16 @@ public class Rack implements Object3D, Updatable {
     private double rotationY = 0;
     private double rotationZ = 0;
 
+    private boolean fromTruck;
+
     public Rack() {
-        this(0, 0, 0, 0, 0, 0);
+        this(0, 0, 0, 0, 0, 0, false);
     }
     public Rack(double x, double z){
-        this(x,0,z,0,0,0);
+        this(x,0,z,0,0,0,false);
     }
-    public Rack(double x, double y, double z){
-        this(x,y,z,0,0,0);
-    }
-    public Rack(double x, double z, double rotationX, double rotationZ){
-        this(x,0,z,rotationX,0,rotationZ);
-    }
-    public Rack(double x, double y, double z, double rotationX, double rotationY, double rotationZ){
+    public Rack(double x, double z, boolean fromTruck){this(x,0,z,0,0,0,fromTruck);}
+    public Rack(double x, double y, double z, double rotationX, double rotationY, double rotationZ, boolean fromTruck){
         this.x = x;
         this.y = y;
         this.z = z;
@@ -36,6 +33,7 @@ public class Rack implements Object3D, Updatable {
         this.rotationY = rotationY;
         this.rotationZ = rotationZ;
         this.uuid = UUID.randomUUID();
+        this.fromTruck = fromTruck;
     }
 
     public void addObserver(PropertyChangeListener pcl) {
@@ -54,6 +52,10 @@ public class Rack implements Object3D, Updatable {
     public boolean update() {
         return true;
     }
+
+    public boolean getFromTruck(){return fromTruck;}
+
+    public void setFromTruck(boolean fromTruck){this.fromTruck = fromTruck;}
 
     @Override
     public String getUUID() {

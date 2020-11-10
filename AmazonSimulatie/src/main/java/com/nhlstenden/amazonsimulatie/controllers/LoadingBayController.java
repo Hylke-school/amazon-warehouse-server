@@ -23,8 +23,8 @@ public class LoadingBayController implements Runnable, PropertyChangeListener {
     private double bayLocation = -15;
     private double roadLocation = -30;
 
-    private int rackAmount = 50;
-    private int packageAmount = 50;
+    private int rackAmount = 0;
+    private int packageAmount = 0;
 
     public LoadingBayController() {
         new Thread(this).start();
@@ -83,7 +83,7 @@ public class LoadingBayController implements Runnable, PropertyChangeListener {
     /**
      * When there is a robot to pick up a rack, call this function
      */
-    private void loadRackOnRobot() {
+    public void loadRackOnRobot() {
         rackAmount--;
         //TODO: Make the robot's pick up a package when there is one
     }
@@ -91,9 +91,13 @@ public class LoadingBayController implements Runnable, PropertyChangeListener {
     /**
      * When there is a robot that brings a package to the loading bay, call this function
      */
-    private void loadPackageOffRobot() {
+    public void loadPackageOffRobot() {
         packageAmount++;
         //TODO: Make the robot drop packages too the loadingbay
+    }
+
+    public int getAtBaySize() {
+        return atBay.size();
     }
 
     /**
