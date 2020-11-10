@@ -24,3 +24,4 @@ hs_err_pid*
 
 # ignore an entire directory
 /.vscode/
+/AmazonSimulatie/target/
