@@ -17,6 +17,7 @@ public class Rack implements Object3D, Updatable {
     private double rotationZ = 0;
 
     private boolean fromTruck;
+    private boolean toTruck = false;
 
     public Rack() {
         this(0, 0, 0, 0, 0, 0, false);
@@ -45,7 +46,7 @@ public class Rack implements Object3D, Updatable {
      * @return boolean, true if the rack is on a robot
      */
     public boolean isBusy(){
-        return this.getY() == 0.15;
+        return this.getY() > 0.16;
     }
 
     @Override
@@ -56,6 +57,10 @@ public class Rack implements Object3D, Updatable {
     public boolean getFromTruck(){return fromTruck;}
 
     public void setFromTruck(boolean fromTruck){this.fromTruck = fromTruck;}
+
+    public boolean getToTruck(){return toTruck;}
+
+    public void setToTruck(boolean toTruck){this.toTruck = toTruck;}
 
     @Override
     public String getUUID() {

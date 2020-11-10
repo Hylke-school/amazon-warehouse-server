@@ -73,14 +73,16 @@ public class World implements Model {
      * calls pickupRack method on robotController, fires remove command to server on the object that gets removed
      */
     public void pickupRack() {
-        if(lbc.getAtBaySize() > 0){
-            Rack rack = robotController.pickupRack();
-            if(rack != null) {
-                worldObjects.remove(rack);
+        robotController.pickupRack();
+        robotController.pickupRackFromTruck();
+        if (lbc.getTrucksAvailable() > 0) {
+            Rack rackToTruck = robotController.pickupRackToTruck();
+            if (rackToTruck != null) {
+                worldObjects.remove(rackToTruck);
                 lbc.loadPackageOffRobot();
                 try {
-                    if (rack.update()) {
-                        pcs.firePropertyChange(Model.REMOVE_COMMAND, null, new ProxyObject3D(rack));
+                    if (rackToTruck.update()) {
+                        pcs.firePropertyChange(Model.REMOVE_COMMAND, null, new ProxyObject3D(rackToTruck));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -100,6 +102,14 @@ public class World implements Model {
      */
     @Override
     public void update() {
+        if(lbc.getRackAmount() > 0){
+            Rack rack = robotController.addRack();
+            if(rack != null){
+                worldObjects.add(rack);
+                lbc.loadRackOnRobot();
+            }
+        }
+
         for (Object3D object : this.worldObjects) {
             if(object instanceof Updatable) {
                 if (((Updatable)object).update()) {

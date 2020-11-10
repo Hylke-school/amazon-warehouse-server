@@ -12,6 +12,7 @@ import com.nhlstenden.amazonsimulatie.models.*;
 public class RobotController {
     private List<Robot> robotList;
     private List<Rack> rackList;
+    private List<Rack> rackListToTruck;
     private boolean[][] rackLocations = new boolean[30][30];
 
     PropertyChangeSupport pcs = new PropertyChangeSupport(this);
@@ -25,6 +26,7 @@ public class RobotController {
     public RobotController(int populateRacksPercentage, int amountRobots) {
         robotList = new ArrayList<>();
         rackList = new ArrayList<>();
+        rackListToTruck = new ArrayList<>();
 
         for (int row = 0; row < rackLocations.length; row++) {
             for (int col = 0; col < rackLocations[row].length; col++) {
@@ -52,17 +54,22 @@ public class RobotController {
      * @param x x location of the rack
      * @param z z location of the rack
      */
-    public void addRack(int x, int z){
+    private void addRack(int x, int z){
         Rack rack = new Rack(x,z);
         rackList.add(rack);
         updateRackLocations();
     }
 
-    public void addRack(boolean fromTruck){
-        int[] dropoffLocation = getDropoffLocation(fromTruck);
-        Rack rack = new Rack(dropoffLocation[0],dropoffLocation[1],fromTruck);
-        rackList.add(rack);
-        updateRackLocations();
+    public Rack addRack(){
+        int[] dropoffLocation = getDropoffLocation(false);
+        if(dropoffLocation != null){
+            Rack rack = new Rack(dropoffLocation[0],dropoffLocation[1],true);
+            rack.setFromTruck(true);
+            rackList.add(rack);
+            updateRackLocations();
+            return rack;
+        }
+        return null;
     }
 
     /**
@@ -72,6 +79,15 @@ public class RobotController {
     public void removeRack(Rack rack){
         try{
             rackList.remove(rack);
+            rackListToTruck.add(rack);
+            updateRackLocations();
+        } catch (NullPointerException e){
+            e.printStackTrace();
+        }
+    }
+    public void removeRackToTruck(Rack rack){
+        try{
+            rackListToTruck.remove(rack);
             updateRackLocations();
         } catch (NullPointerException e){
             e.printStackTrace();
@@ -117,25 +133,63 @@ public class RobotController {
     public Rack pickupRack() {
         int[] dropoffLocation;
         int racklistsize = rackList.size();
+        Rack rack = null;
         if(racklistsize != 0){
-            Rack rack = rackList.get(0);
+            rack = rackList.get(0);
             boolean fromTruck = rack.getFromTruck();
-            for (Robot robot : robotList) {
-                if (!robot.isBusy() && !rack.isBusy()) {
-                    dropoffLocation = getDropoffLocation(fromTruck);
-                    if (dropoffLocation != null) {
-                        robot.pickup(rack, dropoffLocation[0],dropoffLocation[1]);
-                        if(!fromTruck){
-                            removeRack(rack);
-                            return rack;
-                        } else {
-                            rack.setFromTruck(false);
+            boolean toTruck = rack.getToTruck();
+            System.out.printf("pickupRack: fromTruck:%b toTruck:%b\n",fromTruck,toTruck);
+            if(!fromTruck&&!toTruck){
+                Robot robot = robotList.get(0);
+                    if (!robot.isBusy() && !rack.isBusy()) {
+                        dropoffLocation = getDropoffLocation(false);
+                        if (dropoffLocation != null) {
+                            if(robot.pickup(rack,dropoffLocation[0],dropoffLocation[1])){
+                                rack.setToTruck(true);
+                                removeRack(rack);
+
                         }
                     }
                 }
             }
         }
-        return null;
+        return rack;
+    }
+
+    public Rack pickupRackFromTruck(){
+        int[] dropoffLocation;
+        int racklistsize = rackList.size();
+        Rack rack = null;
+        if(racklistsize != 0){
+            rack = rackList.get(0);
+            boolean fromTruck = rack.getFromTruck();
+            boolean toTruck = rack.getToTruck();
+            System.out.printf("pickupRackFromTruck: fromTruck:%b toTruck:%b\n",fromTruck,toTruck);
+            if(fromTruck&&!toTruck){
+                Robot robot = robotList.get(0);
+                    if (!robot.isBusy() && !rack.isBusy()) {
+                        dropoffLocation = getDropoffLocation(true);
+                        if (dropoffLocation != null) {
+                            if(robot.pickup(rack, dropoffLocation[0], dropoffLocation[1])){
+                                rack.setFromTruck(false);
+                            }
+                        }
+                    }
+
+            }
+        }
+        return rack;
+    }
+
+    public Rack pickupRackToTruck(){
+        int racklistsize = rackListToTruck.size();
+        Rack rack = null;
+        if(racklistsize!=0){
+            rack = rackListToTruck.get(0);
+            System.out.printf("removing rack %s\n",rack);
+            removeRackToTruck(rack);
+        }
+        return rack;
     }
 
     /**
@@ -147,6 +201,14 @@ public class RobotController {
         for (int i = 0; i < 30; i++) {
             for (int j = 0; j < 30; j++) {
                 for(Rack rack : rackList){
+                    x = (int)rack.getX();
+                    z = (int)rack.getZ();
+                    if(i==x&&j==z){
+                        rackLocations[i][j] = true;
+                        hasChanged = true;
+                    }
+                }
+                for(Rack rack : rackListToTruck){
                     x = (int)rack.getX();
                     z = (int)rack.getZ();
                     if(i==x&&j==z){

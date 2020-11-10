@@ -30,6 +30,7 @@ public class SimulationController extends Controller {
      */
     @Override
     public void run() {
+        //sleep for 3 seconds, to allow the view to load
         try {
             Thread.sleep(3000);
         } catch (InterruptedException e) {
@@ -37,6 +38,7 @@ public class SimulationController extends Controller {
         }
         Model model = this.getModel();
         World world = (World)model;
+
         while (true) {
             world.pickupRack();
             model.update();

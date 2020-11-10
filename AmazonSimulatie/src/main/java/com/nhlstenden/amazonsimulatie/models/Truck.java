@@ -16,7 +16,7 @@ import java.util.UUID;
 public class Truck implements Object3D, Updatable {
     public static final String LOADING_STATUS = "loading_status";
     public static final String TRUCK_AVAILABLE = "truck_available";
-    public static final int TRUCK_CAPACITY = 30;
+    public static final int TRUCK_CAPACITY = 8;
 
     private UUID uuid;
     private PropertyChangeSupport pcs = new PropertyChangeSupport(this);

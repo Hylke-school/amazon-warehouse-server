@@ -71,6 +71,7 @@ public class Robot implements Object3D, Updatable {
             child.setRotationZ(this.rotationZ);
             return true;
         } else if (hasChanged){
+            hasChanged = false;
             return true;
         } else return false;
 
@@ -103,7 +104,7 @@ public class Robot implements Object3D, Updatable {
      * @return boolean: true if robot is busy
      */
     public boolean isBusy(){
-        return false;
+        return child != null;
     }
 
     /**
@@ -132,6 +133,7 @@ public class Robot implements Object3D, Updatable {
     private boolean moveTo(double x, double z) {
         this.x = x;
         this.z = z;
+        hasChanged = true;
         return true;
     }
 
